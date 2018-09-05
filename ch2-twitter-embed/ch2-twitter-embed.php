@@ -13,7 +13,7 @@ add_shortcode( 'twitterfeed', 'ch2te_twitter_embed_shortcode' );
 
 function ch2te_twitter_embed_shortcode( $atts ) {
     extract( shortcode_atts( array(
-        'user_name' => 'ylefebvre'
+        'user_name' => 'Wordpress'
     ), $atts ) );
     
 	if ( !empty( $user_name ) ) {
