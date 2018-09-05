@@ -11,8 +11,14 @@
 
 add_filter( 'wp_nav_menu_objects', 'ch2nmf_new_nav_menu_items', 10, 2 );
 
-function ch2nmf_new_nav_menu_items( $sorted_menu_items, $args ) {
 
+	function ch2nmf_new_nav_menu_items( $sorted_menu_items, $args ) {
+	print_r( $sorted_menu_items );
+return $sorted_menu_items;
+
+
+
+/*
 	// Check if used is logged in, continue if not logged
 	if ( is_user_logged_in() == FALSE ) {
 		// Loop through all menu items received
@@ -28,4 +34,6 @@ function ch2nmf_new_nav_menu_items( $sorted_menu_items, $args ) {
 	}
 
 	return $sorted_menu_items;
+
+*/
 }
