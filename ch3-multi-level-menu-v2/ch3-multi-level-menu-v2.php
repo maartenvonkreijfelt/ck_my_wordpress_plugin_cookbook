@@ -1,17 +1,15 @@
 <?php
 /*
-  Plugin Name: 3 - Multi-Level Menu
+  Plugin Name:  3 - Multi-Level Menu V2
   Plugin URI:
-  Description: Companion to recipe 'Creating a multi-level administration menu'
+  Description: Companion to recipe 'Adding menu items leading to external pages'
   Author: Maarten von Kreijfelt
   Version: 1.0
 
  */
 
-// Register function to be called when the admin menu is constructed
 add_action( 'admin_menu', 'ch3mlm_admin_menu' );
 
-// Add two menu items to the admin menu, with one being a top-level menu item and the other being a sub-menu
 function ch3mlm_admin_menu() {
 	// Create top-level menu item
 	add_menu_page( 'My Complex Plugin Configuration Page',
@@ -24,4 +22,8 @@ function ch3mlm_admin_menu() {
 		'My Complex Menu Sub-Config Page', 'Sub-Config Page',
 		'manage_options', 'ch3mlm-sub-menu',
 		'ch3mlm_my_complex_submenu' );
+		
+	global $submenu;
+	$url = 'https://www.packtpub.com/books/info/packt/faq';
+	$submenu['ch3mlm-main-menu'][] = array( 'FAQ', 'manage_options', $url );
 }
