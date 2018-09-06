@@ -1,21 +1,12 @@
 <?php
 /*
-  Plugin Name: 2 - Page Header Output V3
+  Plugin Name: 3 - Page Header Output V4
   Plugin URI: 
-  Description: Companion to recipe 'Storing user settings using arrays'
+  Description: Companion to recipe 'Creating an administration page menu item in the Settings menu'
   Author: Maarten von Kreijfelt
   Version: 1.0
-
+  
  */
-
-
-
-/*****************************************************************
- * Code from previous recipes
- * '2.1 Adding output content to page headers using plugin actions
- * and
- * '2.5 Inserting link statistics tracking code in page body using plugin filters'
- *****************************************************************/
 
 add_action( 'wp_head', 'ch2pho_page_header_output' );
 
@@ -63,7 +54,7 @@ function ch2lfa_footer_analytics_code() { ?>
 <?php }
 
 /*****************************************************************
- * Code from recipe '3.2 Storing user settings using arrays'         *
+ * Code from recipe 'Storing user settings using arrays'         *
  *****************************************************************/
 
 register_activation_hook( __FILE__, 'ch2pho_set_default_options_array' );
@@ -75,7 +66,7 @@ function ch2pho_set_default_options_array() {
 function ch2pho_get_options() {
     $options = get_option( 'ch2pho_options', array() );
 
-    $new_options['ga_account_name'] = 'UA-0000000-0'; 
+    $new_options['ga_account_name'] = 'UA-000000-0'; 
     $new_options['track_outgoing_links'] = false;
 	
     $merged_options = wp_parse_args( $options, $new_options ); 
@@ -86,3 +77,17 @@ function ch2pho_get_options() {
     }
     return $merged_options;
 }
+
+/*****************************************************************
+ * Code from recipe 'Creating an administration page menu item   *
+ * in the settings menu'                                         *
+ *****************************************************************/
+
+add_action( 'admin_menu', 'ch2pho_settings_menu', 1 );
+
+function ch2pho_settings_menu() {
+	add_options_page( 'My Google Analytics Configuration',
+		'My Google Analytics', 'manage_options',
+		'ch2pho-my-google-analytics', 'ch2pho_config_page' );
+}
+
