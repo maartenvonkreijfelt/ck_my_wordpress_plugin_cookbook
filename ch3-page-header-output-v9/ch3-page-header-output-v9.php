@@ -1,12 +1,18 @@
 <?php
 /*
   Plugin Name: 3 - Page Header Output V9
-  Plugin URI: 
-  Description: Companion to recipe 'Processing and storing plugin configuration data'
+  Plugin URI:
+  Description: Companion to recipe 'Rendering the admin page contents using HTML'
   Author: Maarten von Kreijfelt
   Version: 1.0
 
  */
+
+
+
+/****************************************************************************************************
+ * Code from recipe 'Adding output content to page headers using plugin actions'  Chapter 2.1       *
+ ****************************************************************************************************/
 
 add_action( 'wp_head', 'ch2pho_page_header_output' );
 
@@ -14,18 +20,27 @@ function ch2pho_page_header_output() { ?>
 
 	<script>
 		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;
-		i[r]=i[r]||function(){
-		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
-		a=s.createElement(o),
-		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
-		m.parentNode.insertBefore(a,m)})(window,document,'script',
-		'https://www.google-analytics.com/analytics.js','ga');
+			i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+			a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
+			m.parentNode.insertBefore(a,m)})(window,document,'script',
+			'https://www.google-analytics.com/analytics.js','ga');
 
 		ga( 'create', 'UA-0000000-0', 'auto' );
 		ga( 'send', 'pageview' );
 	</script>
 
 <?php }
+
+
+
+
+
+/*******************************************************************************************************************
+ * Code from recipe 'Inserting link statistics tracking code in page body using plugin filters'  Chapter 2.1       *
+ *******************************************************************************************************************/
+
 
 add_filter( 'the_content', 'ch2lfa_link_filter_analytics' );
 
@@ -38,49 +53,49 @@ function ch2lfa_link_filter_analytics ( $the_content ) {
 add_action( 'wp_footer', 'ch2lfa_footer_analytics_code' );
 
 function ch2lfa_footer_analytics_code() { ?>
-    
-<script type="text/javascript">
-  function recordOutboundLink( link ) {
-	ga('send', 'event', 'Outbound Links', 'Click',
-		link.href, {
-			'transport': 'beacon',
-			'hitCallback': function() { 
-				document.location = link.href; 
-			}
-		} );
-	}
-</script>
+
+	<script type="text/javascript">
+		function recordOutboundLink( link ) {
+			ga('send', 'event', 'Outbound Links', 'Click',
+				link.href, {
+					'transport': 'beacon',
+					'hitCallback': function() {
+						document.location = link.href;
+					}
+				} );
+		}
+	</script>
 
 <?php }
 
-/*****************************************************************
- * Code from recipe 'Storing user settings using arrays'         *
- *****************************************************************/
+/****************************************************************************
+ * Code from recipe 'Storing user settings using arrays'  Chapter 3.2       *
+ ****************************************************************************/
 
 register_activation_hook( __FILE__, 'ch2pho_set_default_options_array' );
 
-function ch2pho_set_default_options_array() { 
-    ch2pho_get_options();
+function ch2pho_set_default_options_array() {
+	ch2pho_get_options();
 }
 
 function ch2pho_get_options() {
-    $options = get_option( 'ch2pho_options', array() );
+	$options = get_option( 'ch2pho_options', array() );
 
-    $new_options['ga_account_name'] = 'UA-000000-0'; 
-    $new_options['track_outgoing_links'] = false;
-	
-    $merged_options = wp_parse_args( $options, $new_options ); 
+	$new_options['ga_account_name'] = 'UA-000000-0';
+	$new_options['track_outgoing_links'] = false;
 
-    $compare_options = array_diff_key( $new_options, $options );   
-    if ( empty( $options ) || !empty( $compare_options ) ) {
-        update_option( 'ch2pho_options', $merged_options );
-    }
-    return $merged_options;
+	$merged_options = wp_parse_args( $options, $new_options );
+
+	$compare_options = array_diff_key( $new_options, $options );
+	if ( empty( $options ) || !empty( $compare_options ) ) {
+		update_option( 'ch2pho_options', $merged_options );
+	}
+	return $merged_options;
 }
 
 /*****************************************************************
  * Code from recipe 'Creating an administration page menu item   *
- * in the settings menu'                                         *
+ * in the settings menu' Chapter 3.4                                          *
  *****************************************************************/
 
 add_action( 'admin_menu', 'ch2pho_settings_menu' );
@@ -91,9 +106,9 @@ function ch2pho_settings_menu() {
 		'ch2pho-my-google-analytics', 'ch2pho_config_page' );
 }
 
-/*****************************************************************
- * Code from recipe 'Rendering admin page contents using HTML'   
- *****************************************************************/
+/**************************************************************************
+ * Code from recipe 'Rendering admin page contents using HTML'  Chapter 3.8
+ **************************************************************************/
 
 function ch2pho_config_page() {
 	// Retrieve plugin configuration options from database
@@ -101,26 +116,26 @@ function ch2pho_config_page() {
 	?>
 
 	<div id="ch2pho-general" class="wrap">
-	<h2>My Google Analytics</h2><br />
+		<h2>My Google Analytics</h2><br />
 
-	<form method="post" action="admin-post.php">
+		<form method="post" action="admin-post.php">
 
-	 <input type="hidden" name="action"
-		value="save_ch2pho_options" />
+			<input type="hidden" name="action"
+			       value="save_ch2pho_options" />
 
-	 <!-- Adding security through hidden referrer field -->
-	 <?php wp_nonce_field( 'ch2pho' ); ?>
+			<!-- Adding security through hidden referrer field -->
+			<?php wp_nonce_field( 'ch2pho' ); ?>
 
-	Account Name: <input type="text" name="ga_account_name" value="<?php echo esc_html( $options['ga_account_name'] ); ?>"/><br />
-	Track Outgoing Links <input type="checkbox" name="track_outgoing_links" <?php checked( $options['track_outgoing_links'] ); ?>/><br /><br />
-	<input type="submit" value="Submit" class="button-primary"/>
-	</form>
+			Account Name: <input type="text" name="ga_account_name" value="<?php echo esc_html( $options['ga_account_name'] ); ?>"/><br />
+			Track Outgoing Links <input type="checkbox" name="track_outgoing_links" <?php checked( $options['track_outgoing_links'] ); ?>/><br /><br />
+			<input type="submit" value="Submit" class="button-primary"/>
+		</form>
 	</div>
 <?php }
 
-/*****************************************************************
- * Code from recipe 'Processing and storing admin page post data'*
- *****************************************************************/
+/*******************************************************************************
+ * Code from recipe 'Processing and storing admin page post data'  Chapter 3.9 *
+ *******************************************************************************/
 
 add_action( 'admin_init', 'ch2pho_admin_init' );
 
