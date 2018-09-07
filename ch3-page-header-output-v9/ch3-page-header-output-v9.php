@@ -1,18 +1,12 @@
 <?php
 /*
-  Plugin Name: 3 - Page Header Output V8
+  Plugin Name: 3 - Page Header Output V9
   Plugin URI: 
-  Description: Companion to recipe 'Rendering the admin page contents using HTML'
+  Description: Companion to recipe 'Processing and storing plugin configuration data'
   Author: Maarten von Kreijfelt
   Version: 1.0
 
  */
-
-
-
-/****************************************************************************************************
- * Code from recipe 'Adding output content to page headers using plugin actions'  Chapter 2.1       *
- ****************************************************************************************************/
 
 add_action( 'wp_head', 'ch2pho_page_header_output' );
 
@@ -32,15 +26,6 @@ function ch2pho_page_header_output() { ?>
 	</script>
 
 <?php }
-
-
-
-
-
-/*******************************************************************************************************************
- * Code from recipe 'Inserting link statistics tracking code in page body using plugin filters'  Chapter 2.1       *
- *******************************************************************************************************************/
-
 
 add_filter( 'the_content', 'ch2lfa_link_filter_analytics' );
 
@@ -68,9 +53,9 @@ function ch2lfa_footer_analytics_code() { ?>
 
 <?php }
 
-/****************************************************************************
- * Code from recipe 'Storing user settings using arrays'  Chapter 3.2       *
- ****************************************************************************/
+/*****************************************************************
+ * Code from recipe 'Storing user settings using arrays'         *
+ *****************************************************************/
 
 register_activation_hook( __FILE__, 'ch2pho_set_default_options_array' );
 
@@ -95,7 +80,7 @@ function ch2pho_get_options() {
 
 /*****************************************************************
  * Code from recipe 'Creating an administration page menu item   *
- * in the settings menu' Chapter 3.4                                          *
+ * in the settings menu'                                         *
  *****************************************************************/
 
 add_action( 'admin_menu', 'ch2pho_settings_menu' );
@@ -106,9 +91,9 @@ function ch2pho_settings_menu() {
 		'ch2pho-my-google-analytics', 'ch2pho_config_page' );
 }
 
-/**************************************************************************
- * Code from recipe 'Rendering admin page contents using HTML'  Chapter 3.8
- **************************************************************************/
+/*****************************************************************
+ * Code from recipe 'Rendering admin page contents using HTML'   
+ *****************************************************************/
 
 function ch2pho_config_page() {
 	// Retrieve plugin configuration options from database
@@ -132,3 +117,61 @@ function ch2pho_config_page() {
 	</form>
 	</div>
 <?php }
+
+/*****************************************************************
+ * Code from recipe 'Processing and storing admin page post data'*
+ *****************************************************************/
+
+add_action( 'admin_init', 'ch2pho_admin_init' );
+
+function ch2pho_admin_init() {
+	add_action( 'admin_post_save_ch2pho_options',
+		 'process_ch2pho_options' );
+}
+
+function process_ch2pho_options() {
+
+	// Check that user has proper security level
+
+	if ( !current_user_can( 'manage_options' ) )
+		wp_die( 'Not allowed' );
+        
+	// Check that nonce field created in configuration form
+	// is present
+
+	check_admin_referer( 'ch2pho' );
+
+	// Retrieve original plugin options array
+	$options = ch2pho_get_options();
+
+	// Cycle through all text form fields and store their values
+	// in the options array
+
+	foreach ( array( 'ga_account_name' ) as $option_name ) {
+		if ( isset( $_POST[$option_name] ) ) {
+			$options[$option_name] =
+				sanitize_text_field($_POST[$option_name]);
+		}
+	}
+
+	// Cycle through all check box form fields and set the options
+	// array to true or false values based on presence of
+	// variables
+
+	foreach ( array( 'track_outgoing_links' ) as $option_name ) {
+		if ( isset( $_POST[$option_name] ) ) {
+			$options[$option_name] = true;
+		} else {
+			$options[$option_name] = false;
+		}
+	}
+
+	// Store updated options array to database
+	update_option( 'ch2pho_options', $options );
+
+	// Redirect the page to the configuration form that was
+	// processed
+
+	wp_redirect( add_query_arg( 'page', 'ch2pho-my-google-analytics', admin_url( 'options-general.php' ) ) );
+	exit;
+}
