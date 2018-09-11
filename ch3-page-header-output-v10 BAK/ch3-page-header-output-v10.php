@@ -1,8 +1,8 @@
 <?php
 /*
-  Plugin Name 3 - Page Header Output V10 BAK
+  Plugin Name: 3 - Page Header Output V10 BAK
   Plugin URI:
-  Description: Companion to recipe 'Rendering the admin page contents using HTML'
+  Description: Companion to recipe 'Displaying a confirmation message when options are saved'
   Author: Maarten von Kreijfelt
   Version: 1.0
 
@@ -118,7 +118,7 @@ function ch2pho_settings_menu() {
 }
 
 /**************************************************************************
- * Code from recipe 'Rendering admin page contents using HTML'  Chapter  3.10
+ * Code from recipe 'Rendering admin page contents using HTML'  Chapter 3.8
  **************************************************************************/
 
 function ch2pho_config_page() {
@@ -128,7 +128,6 @@ function ch2pho_config_page() {
 
 	<div id="ch2pho-general" class="wrap">
 		<h2>My Google Analytics</h2><br />
-
 
 		<?php if ( isset( $_GET['message'] ) &&
 		           $_GET['message'] == '1' ) { ?>
@@ -152,7 +151,7 @@ function ch2pho_config_page() {
 <?php }
 
 /*******************************************************************************
- * Code from recipe 'Processing and storing admin page post data'  Chapter 3.10 *
+ * Code from recipe 'Processing and storing admin page post data'  Chapter 3.9 *
  *******************************************************************************/
 
 add_action( 'admin_init', 'ch2pho_admin_init' );
@@ -205,9 +204,6 @@ function process_ch2pho_options() {
 	// Redirect the page to the configuration form that was
 	// processed
 
-	wp_redirect( add_query_arg(
-		array( 'page' => 'ch2pho-my-google-analytics',
-		       'message' => '1' ),
-		admin_url( 'options-general.php' ) ) );
+	wp_redirect( add_query_arg(array( 'page' => 'ch2pho-my-google-analytics', 'message' => '1' ),admin_url( 'options-general.php' ) ) );
 	exit;
 }
