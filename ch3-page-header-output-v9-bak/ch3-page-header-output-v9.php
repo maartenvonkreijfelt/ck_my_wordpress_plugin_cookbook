@@ -1,6 +1,6 @@
 <?php
 /*
-  Plugin Name: 3 - Page Header Output V9
+  Plugin Name: 3 - Page Header Output V9 BAK
   Plugin URI:
   Description: Companion to recipe 'Rendering the admin page contents using HTML'
   Author: Maarten von Kreijfelt
