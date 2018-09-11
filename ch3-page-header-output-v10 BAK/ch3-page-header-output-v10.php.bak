@@ -118,7 +118,7 @@ function ch2pho_settings_menu() {
 }
 
 /**************************************************************************
- * Code from recipe 'Rendering admin page contents using HTML'  Chapter 3.8
+ * Code from recipe 'Rendering admin page contents using HTML'  Chapter  3.10
  **************************************************************************/
 
 function ch2pho_config_page() {
@@ -152,7 +152,7 @@ function ch2pho_config_page() {
 <?php }
 
 /*******************************************************************************
- * Code from recipe 'Processing and storing admin page post data'  Chapter 3.9 *
+ * Code from recipe 'Processing and storing admin page post data'  Chapter 3.10 *
  *******************************************************************************/
 
 add_action( 'admin_init', 'ch2pho_admin_init' );
