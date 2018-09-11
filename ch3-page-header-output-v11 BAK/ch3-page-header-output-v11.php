@@ -1,6 +1,6 @@
 <?php
 /*
-  Plugin Name: 3 - Page Header Output V11
+  Plugin Name: 3 - Page Header Output V11 BAK
   Plugin URI:
   Description: Companion to recipe 'Adding custom help pages'
   Author: Maarten von Kreijfelt
@@ -114,16 +114,16 @@ add_action( 'admin_menu', 'ch2pho_settings_menu' );
 function ch2pho_settings_menu() {
 	$options_page =
 		add_options_page( 'My Google Analytics Configuration',
-			'My Google Analytics',
-			'manage_options',
-			'ch2pho-my-google-analytics',
-			'ch2pho_config_page' );
+			'My Google Analytics', 'manage_options',
+			'ch2pho-my-google-analytics', 'ch2pho_config_page' );
+
 
 	if ( !empty( $options_page ) ) {
 		add_action( 'load-' . $options_page, 'ch2pho_help_tabs' );
 	}
 
 }
+
 
 /**************************************************************************
  * Code from recipe 'Rendering admin page contents using HTML'  Chapter 3.8
