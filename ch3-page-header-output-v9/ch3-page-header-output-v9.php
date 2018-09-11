@@ -72,6 +72,17 @@ function ch2lfa_footer_analytics_code() { ?>
  * Code from recipe 'Storing user settings using arrays'  Chapter 3.2       *
  ****************************************************************************/
 
+
+register_activation_hook( __FILE__, 'ch3io_set_default_options' );
+
+
+function ch3io_set_default_options() {
+	if ( false === get_option( 'ch3io_ga_account_name' ) ) {
+		add_option( 'ch3io_ga_account_name', 'UA-0000000-0' );
+	}
+}
+
+
 register_activation_hook( __FILE__, 'ch2pho_set_default_options_array' );
 
 function ch2pho_set_default_options_array() {
@@ -87,8 +98,10 @@ function ch2pho_get_options() {
 	$merged_options = wp_parse_args( $options, $new_options );
 
 	$compare_options = array_diff_key( $new_options, $options );
-	if ( empty( $options ) || !empty( $compare_options ) ) {
+	if ( !empty( $options ) && !empty( $compare_options ) ) {
 		update_option( 'ch2pho_options', $merged_options );
+	}elseif( empty( $options ) && !empty( $compare_options ) ){
+		ch2pho_set_default_options_array( 'ch2pho_options', $merged_options );
 	}
 	return $merged_options;
 }
@@ -150,7 +163,7 @@ function process_ch2pho_options() {
 
 	if ( !current_user_can( 'manage_options' ) )
 		wp_die( 'Not allowed' );
-        
+
 	// Check that nonce field created in configuration form
 	// is present
 
