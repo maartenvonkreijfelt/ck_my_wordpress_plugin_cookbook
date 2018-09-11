@@ -1,6 +1,6 @@
 <?php
 /*
-  Plugin Name: 3 - Individual Options
+  Plugin Name: 3 - Individual Options BAK
   Plugin URI: 
   Description: Companion to recipe 'Creating default user settings on plugin initialization'
   Author: Maarten von Kreijfelt
