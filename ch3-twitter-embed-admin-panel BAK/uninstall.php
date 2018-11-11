@@ -8,6 +8,6 @@ if( !defined( 'WP_UNINSTALL_PLUGIN' ) )
 
 // Check if options exist and delete them if present
 
-if ( get_option( 'ch3sapi_options' ) != false ) {
-	delete_option( 'ch3sapi_options' );
+if ( get_option( 'ch2te_options_' ) != false ) {
+	delete_option( 'ch2te_options_' );
 }
