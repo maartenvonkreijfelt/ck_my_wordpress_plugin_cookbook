@@ -1,11 +1,11 @@
 <?php
 /*
-  Plugin Name: 3 - Hide Menu Item
+  Plugin Name: Chapter 3 - Hide Menu Item
   Plugin URI:
   Description: Companion to recipe 'Hiding items which users should not access from the default menu'
-  Author: Maarten von Kreijfelt
+  Author: ylefebvre
   Version: 1.0
-
+  Author URI: http://ylefebvre.ca/
  */
 
 // Register function to be called when admin menu is constructed
