@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Chapter 4 -  Wordpress Tutorials
+ * Plugin Name: Chapter 4 -  Wordpress Tutorials v1
  * Plugin URI:
- *   Description: Companion to recipe 'Creating a custom post type' (in chapter 4)
+ *   Description: Companion to recipe 'Creating a custom post type' (in chapter 4.1)
  *   Author: Maarten von Kreijfelt
  *   Version: 1.0
  */
