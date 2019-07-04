@@ -82,11 +82,11 @@ function ch4_br_display_review_details_meta_box( $wordpress_tutorials ) {
     ?>
     <table>
         <tr>
-            <td style="width: 150px">Book Author</td>
+            <td style="width: 150px">Tutorials Author</td>
             <td><input type='text' size='80' name='tutorial_review_author_name' value='<?php echo $tutorial_author; ?>' /></td>
         </tr>
         <tr>
-            <td style="width: 150px">Book Rating</td>
+            <td style="width: 150px">Tutorial Rating</td>
             <td>
                 <select style="width: 100px" name="tutorial_review_rating">
                     <!-- Loop to generate all items in dropdown list -->
@@ -106,7 +106,7 @@ add_action( 'save_post', 'ch4_br_add_book_review_fields', 10, 2 );
 
 function ch4_br_add_book_review_fields( $post_id = false, $post = false ) {
     // Check post type for book reviews
-    if ( 'tutorials_reviews' == $post->post_type ) {
+    if ( 'wordpress_tutorials' == $post->post_type ) {
         // Store data in post meta table if present in post data
         if ( isset( $_POST['tutorial_review_author_name'] ) ) {
             update_post_meta( $post_id, 'tutorial_author', sanitize_text_field( $_POST['tutorial_review_author_name'] ) );
