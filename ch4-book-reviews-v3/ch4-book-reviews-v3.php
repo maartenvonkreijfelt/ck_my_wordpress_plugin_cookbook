@@ -1,13 +1,13 @@
 <?php
-/**
- * Plugin Name: Chapter 4 -  Wordpress Tutorials v2
- * Plugin URI:
- *   Description: Companion to recipe 'Adding a new section to the custom post type editor' (in chapter 4.2)
- *   Author: Maarten von Kreijfelt
- *   Version: 1.0
+
+/*
+  Plugin Name: Chapter 4 - Wordpress Tutorials V3
+  Plugin URI: 
+  Description: Companion to recipe 'Displaying single custom post type items using a custom layout'
+  Author: Maarten von Kreijfelt
+  Version: 1.0
+  Author URI:
  */
-
-
 
 /****************************************************************************
  * Code from recipe 'Creating a custom post type'
@@ -106,7 +106,7 @@ add_action( 'save_post', 'ch4_br_add_book_review_fields', 10, 2 );
 
 function ch4_br_add_book_review_fields( $post_id = false, $post = false ) {
     // Check post type for wordpress tutorials
-    if ( 'wordpress_tutorials' == $post->post_type ) {
+    if ( 'tutorials_reviews' == $post->post_type ) {
         // Store data in post meta table if present in post data
         if ( isset( $_POST['tutorial_review_author_name'] ) ) {
             update_post_meta( $post_id, 'tutorial_author', sanitize_text_field( $_POST['tutorial_review_author_name'] ) );
@@ -119,3 +119,60 @@ function ch4_br_add_book_review_fields( $post_id = false, $post = false ) {
 }
 
 
+/************************************************************************************
+ * Code from recipe 'Displaying single custom post type items using a custom layout'
+ ************************************************************************************/
+
+add_filter( 'template_include', 'ch4_br_template_include', 1 );
+
+function ch4_br_template_include( $template_path ){
+
+	if ( 'wordpress_tutorials' == get_post_type() ) {
+		if ( is_single() ) {
+			// checks if the file exists in the theme first,
+			// otherwise install content filter
+			if ( $theme_file = locate_template( array( 'single-wordpress_tutorials.php' ) ) ) {
+				$template_path = $theme_file;
+			} else {
+				add_filter( 'the_content', 'ch4_br_display_single_book_review', 20 );
+			}
+		}
+	}
+
+	return $template_path;
+}
+
+function ch4_br_display_single_book_review( $content ) {
+    if ( !empty( get_the_ID() ) ) {
+        // Display featured image in right-aligned floating div
+        $content .= '<div style="float: right; margin: 10px">';
+        $content .= get_the_post_thumbnail( get_the_ID(), 'medium' );
+        $content .= '</div>';
+
+		$content .= '<div class="entry-content">';
+
+        // Display Author Name
+        $content .= '<strong>Author: </strong>';
+        $content .= esc_html( get_post_meta( get_the_ID(), 'book_author', true ) );
+        $content .= '<br />';
+
+        // Display yellow stars based on rating -->
+        $content .= '<strong>Rating: </strong>';
+
+        $nb_stars = intval( get_post_meta( get_the_ID(), 'book_rating', true ) );
+
+        for ( $star_counter = 1; $star_counter <= 5; $star_counter++ ) {
+            if ( $star_counter <= $nb_stars ) {
+                $content .= '<img src="' . plugins_url( 'star-icon.png', __FILE__ ) . '" />';
+            } else {
+                $content .= '<img src="' .
+                    plugins_url( 'star-icon-grey.png', __FILE__ ) . '" />';
+            }
+         }
+
+         // Display book review contents
+         $content .= '<br /><br />' . get_the_content( get_the_ID() ) . '</div>';
+
+         return $content;
+     }
+}
