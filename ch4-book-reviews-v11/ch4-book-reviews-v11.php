@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: Chapter 4 - Book Reviews V10
+  Plugin Name: Chapter 4 - Book Reviews V11
   Plugin URI: 
-  Description: Companion to recipe 'Adding Quick Edit fields for custom categories'
+  Description: Companion to recipe 'Updating page title to include custom post data using plugin filters'
   Author: ylefebvre
   Version: 1.0
   Author URI: http://ylefebvre.ca/
@@ -113,7 +113,7 @@ function ch4_br_display_review_details_meta_box( $book_review ) {
 				$book_types = get_terms( 'book_reviews_book_type', 
                                                          array( 'orderby' => 'name',
                                                                 'hide_empty' => 0 ) );
-				
+																
 				// Check if book types were found
 				if ( $book_types ) {
 					echo '<select name="book_review_book_type" style="width: 400px">';
@@ -191,7 +191,7 @@ function ch4_br_display_single_book_review( $content ) {
         $content .= get_the_post_thumbnail( get_the_ID(), 'medium' );
         $content .= '</div>';
 		
-		$content .= '<div class="entry-content">';			
+		$content .= '<div class="entry-content">';
 
         // Display Author Name
         $content .= '<strong>Author: </strong>';
@@ -659,3 +659,22 @@ function ch4_br_save_quick_edit_data( $ID = false, $post = false ) {
         }
     } 
 }
+
+/****************************************************************************
+ * Code from recipe 'Updating page title to include custom post data using
+ * plugin filters'
+ ****************************************************************************/
+
+add_filter( 'document_title_parts', 'ch4_br_format_book_review_title' ); 
+
+function ch4_br_format_book_review_title( $the_title ) { 
+    if ( 'book_reviews' == get_post_type() && is_single() ) { 
+        $book_author = esc_html( get_post_meta( get_the_ID(),  
+                                   'book_author', true ) ); 
+        if ( !empty( $book_author ) ) {
+            $the_title['title'] .= ' by ' . $book_author;
+        }
+    } 
+ 
+    return $the_title; 
+} 
