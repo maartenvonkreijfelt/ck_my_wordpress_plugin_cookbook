@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: Chapter 4 - Book Reviews V6
+  Plugin Name: Chapter 4 - Book Reviews V7
   Plugin URI: 
-  Description: Companion to recipe 'Adding custom fields to categories'
+  Description: Companion to recipe 'Hiding the category editor from the custom post type editor'
   Author: ylefebvre
   Version: 1.0
   Author URI: http://ylefebvre.ca/
@@ -43,7 +43,7 @@ function ch4_br_create_book_post_type() {
 		)
 	);
 
-	/* Code from recipe 'Adding custom taxonomies for custom post types */    
+/* Code from recipe 'Adding custom taxonomies for custom post types */    
 	register_taxonomy(
 		'book_reviews_book_type',
 		'book_reviews',
@@ -54,6 +54,7 @@ function ch4_br_create_book_post_type() {
 				'new_item_name' => "New Book Type Name"
 			),
 			'show_ui' => true,
+			'meta_box_cb' => false,
 			'show_tagcloud' => false,
 			'hierarchical' => true
 		)
@@ -94,6 +95,40 @@ function ch4_br_display_review_details_meta_box( $book_review ) {
 				</select>
 			</td>
 		</tr>
+		
+		<!-- *********************************************************
+			* Code from recipe 'Hiding the taxonomy editor from the
+			* post editor while remaining in the admin menu'
+			******************************************************* -->
+		<tr>
+			<td>Book Type</td>
+			<td>
+				<?php 
+
+				// Retrieve array of types assigned to post
+				$assigned_types = wp_get_post_terms( $book_review->ID, 'book_reviews_book_type' );
+				
+				// Retrieve array of all book types in system
+				$book_types = get_terms( 'book_reviews_book_type', 
+                                                         array( 'orderby' => 'name',
+                                                                'hide_empty' => 0 ) );
+				
+				// Check if book types were found
+				if ( $book_types ) {
+					echo '<select name="book_review_book_type" style="width: 400px">';
+
+					// Display all book types
+					foreach ( $book_types as $book_type ) {
+						echo '<option value="' . $book_type->term_id . '" ';
+						if ( !empty( $assigned_types ) ) {
+							selected( $assigned_types[0]->term_id, $book_type->term_id );
+						}
+						echo '>' . $book_type->name . '</option>';
+					}
+					echo '</select>';
+		} ?>
+			</td>
+		</tr>
 	</table>
 
 <?php }
@@ -112,6 +147,15 @@ function ch4_br_add_book_review_fields( $post_id = false, $post = false ) {
 		
 		if ( isset( $_POST['book_review_rating'] ) && !empty( $_POST['book_review_rating'] ) ) {
 			update_post_meta( $post_id, 'book_rating', intval( $_POST['book_review_rating'] ) );
+		}
+
+		/*******************************************************************
+		* Code from recipe 'Hiding the taxonomy editor from the post editor 
+		* while remaining in the admin menu'
+		*******************************************************************/
+
+		if ( isset( $_POST['book_review_book_type'] ) && !empty( $_POST['book_review_book_type'] ) ) {
+			wp_set_post_terms( $post_id, intval( $_POST['book_review_book_type'] ), 'book_reviews_book_type' );
 		}
 	}
 }
@@ -167,7 +211,7 @@ function ch4_br_display_single_book_review( $content ) {
             }
         }
 		
-		$book_types = wp_get_post_terms( get_the_ID(), 
+				$book_types = wp_get_post_terms( get_the_ID(), 
                 'book_reviews_book_type' ); 
  
 		$content .= '<br /><strong>Type: </strong>';
@@ -186,7 +230,7 @@ function ch4_br_display_single_book_review( $content ) {
 		}
 
         // Display book review contents
-        $content .= '<br /><br />' . get_the_content( get_the_ID() ) . '</div>';
+        $content .= '<br />' . get_the_content( get_the_ID() ) . '</div>';
 
         return $content;
      }
