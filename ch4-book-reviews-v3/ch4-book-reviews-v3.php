@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: Chapter 4 - Book Reviews V2
+  Plugin Name: Chapter 4 - Book Reviews V3
   Plugin URI: 
-  Description: Companion to recipe 'Adding a new section to the custom post type editor'
+  Description: Companion to recipe 'Displaying single custom post type items using a custom layout'
   Author: ylefebvre
   Version: 1.0
   Author URI: http://ylefebvre.ca/
@@ -98,4 +98,62 @@ function ch4_br_add_book_review_fields( $post_id = false, $post = false ) {
 			update_post_meta( $post_id, 'book_rating', intval( $_POST['book_review_rating'] ) );
 		}
 	}
+}
+
+/************************************************************************************
+ * Code from recipe 'Displaying single custom post type items using a custom layout'
+ ************************************************************************************/
+
+add_filter( 'template_include', 'ch4_br_template_include', 1 );
+
+function ch4_br_template_include( $template_path ){
+	
+	if ( 'book_reviews' == get_post_type() ) {
+		if ( is_single() ) {
+			// checks if the file exists in the theme first,
+			// otherwise install content filter
+			if ( $theme_file = locate_template( array( 'single-book_reviews.php' ) ) ) {
+				$template_path = $theme_file;
+			} else {
+				add_filter( 'the_content', 'ch4_br_display_single_book_review', 20 );
+			}
+		}
+	}	
+	
+	return $template_path;
+}
+
+function ch4_br_display_single_book_review( $content ) {
+    if ( !empty( get_the_ID() ) ) {
+        // Display featured image in right-aligned floating div
+        $content .= '<div style="float: right; margin: 10px">';
+        $content .= get_the_post_thumbnail( get_the_ID(), 'medium' );
+        $content .= '</div>';
+		
+		$content .= '<div class="entry-content">';
+
+        // Display Author Name
+        $content .= '<strong>Author: </strong>';
+        $content .= esc_html( get_post_meta( get_the_ID(), 'book_author', true ) );
+        $content .= '<br />';
+
+        // Display yellow stars based on rating -->
+        $content .= '<strong>Rating: </strong>';
+
+        $nb_stars = intval( get_post_meta( get_the_ID(), 'book_rating', true ) );
+
+        for ( $star_counter = 1; $star_counter <= 5; $star_counter++ ) {
+            if ( $star_counter <= $nb_stars ) {
+                $content .= '<img src="' . plugins_url( 'star-icon.png', __FILE__ ) . '" />';
+            } else {
+                $content .= '<img src="' .
+                    plugins_url( 'star-icon-grey.png', __FILE__ ) . '" />';
+            }
+         }
+
+         // Display book review contents
+         $content .= '<br /><br />' . get_the_content( get_the_ID() ) . '</div>';
+
+         return $content;
+     }
 }
