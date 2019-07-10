@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: Chapter 4 - Book Reviews V7
+  Plugin Name: Chapter 4 - Book Reviews V8
   Plugin URI: 
-  Description: Companion to recipe 'Hiding the category editor from the custom post type editor'
+  Description: Companion to recipe 'Displaying additional columns in the custom post list page'
   Author: ylefebvre
   Version: 1.0
   Author URI: http://ylefebvre.ca/
@@ -211,7 +211,7 @@ function ch4_br_display_single_book_review( $content ) {
             }
         }
 		
-				$book_types = wp_get_post_terms( get_the_ID(), 
+		$book_types = wp_get_post_terms( get_the_ID(), 
                 'book_reviews_book_type' ); 
  
 		$content .= '<br /><strong>Type: </strong>';
@@ -230,7 +230,7 @@ function ch4_br_display_single_book_review( $content ) {
 		}
 
         // Display book review contents
-        $content .= '<br />' . get_the_content( get_the_ID() ) . '</div>';
+        $content .= '<br /><br />' . get_the_content( get_the_ID() ) . '</div>';
 
         return $content;
      }
@@ -347,4 +347,93 @@ function ch4_br_save_book_type_new_fields( $term_id, $tt_id ) {
 	if ( isset( $_POST['book_type_color'] ) && ( '#' == $_POST['book_type_color'] || preg_match( '/#([a-f0-9]{3}){1,2}\b/i', $_POST['book_type_color'] ) ) ) {
 		$returnvalue = update_term_meta( $term_id, 'book_type_color', $_POST['book_type_color'] );
 	}
+}
+
+/****************************************************************************
+ * Code from recipe 'Displaying additional columns in custom post list page'
+ ****************************************************************************/
+
+// Register function to be called when column list is being prepared
+add_filter( 'manage_edit-book_reviews_columns', 'ch4_br_add_columns' );
+
+// Function to add columns for author and type in book review listing
+// and remove comments columns
+function ch4_br_add_columns( $columns ) {
+	$columns['book_reviews_author'] = 'Author';
+	$columns['book_reviews_rating'] = 'Rating';
+	$columns['book_reviews_type'] = 'Type';
+	unset( $columns['comments'] );
+
+	return $columns;
+}
+
+// Register function to be called when custom post columns are rendered
+add_action( 'manage_posts_custom_column', 'ch4_br_populate_columns' );
+
+// Function to send data for custom columns when displaying items
+function ch4_br_populate_columns( $column ) {
+	global $post;
+
+	// Check column name and send back appropriate data
+	if ( 'book_reviews_author' == $column ) {
+		$book_author = esc_html( get_post_meta( get_the_ID(), 'book_author', true ) );
+		echo $book_author;
+	}
+	elseif ( 'book_reviews_rating' == $column ) {
+		$book_rating = get_post_meta( get_the_ID(), 'book_rating', true );
+		echo $book_rating . ' stars';
+	}
+	elseif ( 'book_reviews_type' == $column ) {
+		$book_types = wp_get_post_terms( get_the_ID(), 'book_reviews_book_type' );
+
+		if ( $book_types ) {
+            $book_cat_color = get_term_meta( $book_types[0]->term_id, 'book_type_color', true );
+
+            if ( '#' != $book_cat_color ) {
+                echo '<span style="background-color: ' . $book_cat_color;
+                echo '; color: #fff; padding: 6px;">';
+                echo $book_types[0]->name . '</span>';
+            } else {
+                echo $book_types[0]->name;
+            }
+        } else {
+            echo 'None Assigned'; 
+        }
+	}
+}
+
+add_filter( 'manage_edit-book_reviews_sortable_columns', 'ch4_br_author_column_sortable' );
+
+// Register the author and rating columns are sortable columns
+function ch4_br_author_column_sortable( $columns ) {
+	$columns['book_reviews_author'] = 'book_reviews_author';
+	$columns['book_reviews_rating'] = 'book_reviews_rating';
+
+	return $columns;
+}
+
+// Register function to be called when queries are being prepared to
+// display post listing
+add_filter( 'request', 'ch4_br_column_ordering' );
+
+// Function to add elements to query variable based on incoming arguments
+function ch4_br_column_ordering( $vars ) {
+	if ( !is_admin() ) {
+		return $vars;
+	}
+        
+	if ( isset( $vars['orderby'] ) && 'book_reviews_author' == $vars['orderby'] ) {
+		$vars = array_merge( $vars, array(
+				'meta_key' => 'book_author',
+				'orderby' => 'meta_value'
+		) );
+	}
+	elseif ( isset( $vars['orderby'] ) && 'book_reviews_rating' == $vars['orderby'] ) {
+		$vars = array_merge( $vars, array(
+				'meta_key' => 'book_rating',
+				'orderby' => 'meta_value_num'
+		) );
+	}
+
+	return $vars;
 }
