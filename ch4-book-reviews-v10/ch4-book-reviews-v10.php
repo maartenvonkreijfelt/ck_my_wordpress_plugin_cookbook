@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: Chapter 4 - Book Reviews V9
+  Plugin Name: Chapter 4 - Book Reviews V10
   Plugin URI: 
-  Description: Companion to recipe 'Adding filters for custom categories to the custom post list page'
+  Description: Companion to recipe 'Adding Quick Edit fields for custom categories'
   Author: ylefebvre
   Version: 1.0
   Author URI: http://ylefebvre.ca/
@@ -55,6 +55,7 @@ function ch4_br_create_book_post_type() {
 			),
 			'show_ui' => true,
 			'meta_box_cb' => false,
+			'show_in_quick_edit' => false,
 			'show_tagcloud' => false,
 			'hierarchical' => true
 		)
@@ -211,7 +212,7 @@ function ch4_br_display_single_book_review( $content ) {
             }
         }
 		
-				$book_types = wp_get_post_terms( get_the_ID(), 
+		$book_types = wp_get_post_terms( get_the_ID(), 
                 'book_reviews_book_type' ); 
  
 		$content .= '<br /><strong>Type: </strong>';
@@ -482,4 +483,179 @@ function ch4_br_perform_book_type_filtering( $query ) {
 			$term = get_term_by( 'id',$qv['book_reviews_book_type'],'book_reviews_book_type' );
 			$qv['book_reviews_book_type'] = $term->slug;
     }
+}
+
+/****************************************************************************
+ * Code from recipe 'Adding Quick Edit fields for custom categories'
+ ****************************************************************************/
+
+add_action( 'quick_edit_custom_box', 'ch4_br_display_custom_quickedit_link', 10, 2 );
+
+function ch4_br_display_custom_quickedit_link( $column_name, $post_type ) {
+    if ( 'book_reviews' == $post_type ) {
+        switch ( $column_name ) {
+            case 'book_reviews_author': ?>
+                <fieldset class="inline-edit-col-right">
+                <div class="inline-edit-col">
+                    <label><span class="title">Author</span></label>
+                    <input type="text" name='book_reviews_author_input'
+                           id='book_reviews_author_input' value="">
+                </div>
+            <?php break;
+            case 'book_reviews_rating': ?>
+                <div class="inline-edit-col">
+                    <label><span class="title">Rating</span></label>
+                    <select name='book_reviews_rating_input'
+                            id='book_reviews_rating_input'>
+                    <?php // Generate all items of drop-down list 
+                    for ( $rating = 5; $rating >= 1; $rating -- ) { ?> 
+                        <option value="<?php echo $rating; ?>">
+                        <?php echo $rating; ?> stars 
+                    <?php } ?> 
+                    </select>
+                </div>
+            <?php break;
+            case 'book_reviews_type': ?>
+                <div class="inline-edit-col">
+                    <label><span class="title">Type</span></label>
+                    <?php
+                    $terms = get_terms( 
+                             array( 'taxonomy' => 'book_reviews_book_type',
+                                    'hide_empty' => false ) );
+                    ?>
+                    <select name='book_reviews_type_input'
+                            id='book_reviews_type_input'>
+                    <?php foreach ($terms as $index => $term) {
+                        echo '<option class="book_reviews_type-option"';
+                        echo 'value="' . $term->term_id . '"';
+                        selected( 0, $index );
+                        echo '>' . $term->name. '</option>';
+                    } ?>
+                    </select>
+                </div>
+            <?php break;
+        } 
+    } 
+}
+
+add_action( 'admin_footer', 'ch4_br_quick_edit_js' );
+
+function ch4_br_quick_edit_js() {
+    global $current_screen;
+    if ( ( 'edit-book_reviews' !== $current_screen->id ) ||
+         ( 'book_reviews' !== $current_screen->post_type ) ) {
+        return;
+    } ?>
+
+    <script type="text/javascript">
+    function set_inline_book_reviews( bookReviewArray ) {
+        // revert Quick Edit menu so that it refreshes properly
+        inlineEditPost.revert();
+        var inputBookAuthor = 
+            document.getElementById('book_reviews_author_input');
+        inputBookAuthor.value = bookReviewArray[0];
+ 
+        var inputRating =
+            document.getElementById('book_reviews_rating_input');
+        for (i = 0; i < inputRating.options.length; i++) {
+            if ( inputRating.options[i].value == bookReviewArray[1] ) {
+                inputRating.options[i].setAttribute( 'selected',
+                                                     'selected' );
+            } else {
+                inputRating.options[i].removeAttribute( 'selected' );
+            }
+        } 
+ 
+        var inputBookType =
+            document.getElementById('book_reviews_type_input');
+        for (i = 0; i < inputBookType.options.length; i++) {
+            if ( inputBookType.options[i].value == bookReviewArray[2] ) {
+                inputBookType.options[i].setAttribute( 'selected',
+                                                       'selected' );
+            } else {
+                inputBookType.options[i].removeAttribute( 'selected' );
+            }
+        } 
+    }
+ </script>
+ <?php }
+ 
+ add_filter( 'post_row_actions', 'ch4_br_quick_edit_link', 10, 2 );
+ 
+ function ch4_br_quick_edit_link( $actions, $post ) {
+    global $current_screen;
+    $post_id = '';
+
+    if ( ( isset( $current_screen ) && 
+           $current_screen->id != 'edit-book_reviews' &&
+           $current_screen->post_type != 'book_reviews' ) 
+         || ( isset( $_POST['screen'] ) &&
+              $_POST['screen'] != 'edit-book_reviews' ) ) {
+        return $actions;
+    }
+
+    if ( !empty( $post->ID ) ) {
+        $post_id = $post->ID;
+    } elseif ( isset( $_POST['post_ID'] ) ) {
+        $post_id = intval( $_POST['post_ID'] );
+    }
+
+    if ( !empty( $post_id ) ) {
+        $book_author = esc_html( get_post_meta( $post_id, 
+                                     'book_author', true ) ); 
+        $book_rating = esc_html( get_post_meta( $post_id, 
+                                     'book_rating', true ) );
+        $book_reviews_types = wp_get_post_terms( $post_id, 
+                                     'book_reviews_book_type',
+                                     array( 'fields' => 'all' ) );
+		if ( empty( $book_reviews_types ) ) {
+			$book_reviews_types[0] = (object) array( 'term_id' => 0 );
+		}
+ 
+        $idx = 'inline hide-if-no-js';
+        $actions[$idx] = '<a href="#" class="editinline" title="';
+        $actions[$idx] .= esc_attr( __( 'Edit this item inline' ) ) . '" ';
+        $actions[$idx] .= " onclick=\"var bookReviewArray = new Array('";
+        $actions[$idx] .= "{$book_author}', '{$book_rating}', ";
+        $actions[$idx] .= "'{$book_reviews_types[0]->term_id}');";
+        $actions[$idx] .= "set_inline_book_reviews(bookReviewArray)\">";
+        $actions[$idx] .= __( 'Quick&nbsp;Edit' );
+        $actions[$idx] .= '</a>';
+    }
+    return $actions;
+}
+
+add_action( 'save_post', 'ch4_br_save_quick_edit_data', 10, 2 );
+
+function ch4_br_save_quick_edit_data( $ID = false, $post = false ) {
+    // Do not save if auto-saving, not book reviews, no permissions
+    if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) ||
+         ( isset( $_POST['post_type'] ) && 'book_reviews' != $_POST['post_type'] ) ||
+         !current_user_can( 'edit_page', $ID ) ) {
+        return $ID;
+    }
+
+    $post = get_post( $ID );
+    if ( !empty( $post ) && 'revision' != $post->post_type ) {
+        if ( isset( $_POST['book_reviews_author_input'] ) ) {
+            update_post_meta( $ID, 'book_author', 
+              sanitize_text_field( $_POST['book_reviews_author_input'] ) ); 
+        }
+ 
+        if ( isset( $_POST['book_reviews_rating_input'] ) ) {
+            update_post_meta( $ID, 'book_rating', 
+                intval( $_POST['book_reviews_rating_input'] ) ); 
+        }
+ 
+        if ( isset( $_POST['book_reviews_type_input'] ) ) {
+            $term = term_exists( 
+                        intval( $_POST['book_reviews_type_input'] ),
+                                'book_reviews_book_type' );
+            if ( !empty( $term ) ) {
+                wp_set_object_terms( $ID, 
+                    intval( $_POST['book_reviews_type_input'] ), 
+                            'book_reviews_book_type' );
+            }
+        }
+    } 
 }
