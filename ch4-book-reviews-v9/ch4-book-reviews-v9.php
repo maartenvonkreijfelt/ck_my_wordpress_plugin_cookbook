@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: Chapter 4 - Book Reviews V8
+  Plugin Name: Chapter 4 - Book Reviews V9
   Plugin URI: 
-  Description: Companion to recipe 'Displaying additional columns in the custom post list page'
+  Description: Companion to recipe 'Adding filters for custom categories to the custom post list page'
   Author: ylefebvre
   Version: 1.0
   Author URI: http://ylefebvre.ca/
@@ -190,7 +190,7 @@ function ch4_br_display_single_book_review( $content ) {
         $content .= get_the_post_thumbnail( get_the_ID(), 'medium' );
         $content .= '</div>';
 		
-		$content .= '<div class="entry-content">';		
+		$content .= '<div class="entry-content">';			
 
         // Display Author Name
         $content .= '<strong>Author: </strong>';
@@ -211,7 +211,7 @@ function ch4_br_display_single_book_review( $content ) {
             }
         }
 		
-		$book_types = wp_get_post_terms( get_the_ID(), 
+				$book_types = wp_get_post_terms( get_the_ID(), 
                 'book_reviews_book_type' ); 
  
 		$content .= '<br /><strong>Type: </strong>';
@@ -349,6 +349,7 @@ function ch4_br_save_book_type_new_fields( $term_id, $tt_id ) {
 	}
 }
 
+
 /****************************************************************************
  * Code from recipe 'Displaying additional columns in custom post list page'
  ****************************************************************************/
@@ -436,4 +437,49 @@ function ch4_br_column_ordering( $vars ) {
 	}
 
 	return $vars;
+}
+
+/****************************************************************************
+ * Code from recipe 'Adding filters for custom taxonomies to the custom
+ * post list page'
+ ****************************************************************************/
+
+// Register function to be called when displaying post filter drop-down lists
+add_action( 'restrict_manage_posts', 'ch4_br_book_type_filter_list' );
+
+// Function to display book type drop-down list for book reviews
+function ch4_br_book_type_filter_list() {
+	$screen = get_current_screen(); 
+    global $wp_query; 
+	if ( 'book_reviews' == $screen->post_type ) {
+		wp_dropdown_categories( array(
+			'show_option_all'	=>  'Show All Book Types',
+			'taxonomy'			=>  'book_reviews_book_type',
+			'name'				=>  'book_reviews_book_type',
+			'orderby'			=>  'name',
+			'selected'        =>   
+            ( isset( $wp_query->query['book_reviews_book_type'] ) ? 
+                 $wp_query->query['book_reviews_book_type'] : '' ),
+			'hierarchical'		=>  false,
+			'depth'				=>  3,
+			'show_count'		=>  false,
+			'hide_empty'		=>  true,
+		) );
+	}
+}
+
+// Register function to be called when preparing post query
+add_filter( 'parse_query', 'ch4_br_perform_book_type_filtering' );
+
+// Function to modify query variable based on filter selection
+function ch4_br_perform_book_type_filtering( $query ) {
+	$qv = &$query->query_vars;
+
+	if ( isset( $qv['book_reviews_book_type'] ) &&
+         !empty( $qv['book_reviews_book_type'] ) && 
+         is_numeric( $qv['book_reviews_book_type'] ) ) {
+
+			$term = get_term_by( 'id',$qv['book_reviews_book_type'],'book_reviews_book_type' );
+			$qv['book_reviews_book_type'] = $term->slug;
+    }
 }
