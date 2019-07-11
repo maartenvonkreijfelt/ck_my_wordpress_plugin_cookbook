@@ -4,9 +4,9 @@
   Plugin Name: Chapter 4 - Book Reviews V3
   Plugin URI: 
   Description: Companion to recipe 'Displaying single custom post type items using a custom layout'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI:
  */
 
 /****************************************************************************
@@ -125,6 +125,8 @@ function ch4_br_template_include( $template_path ){
 
 function ch4_br_display_single_book_review( $content ) {
     if ( !empty( get_the_ID() ) ) {
+        //remove old content first and then attach new content
+        $content ='';
         // Display featured image in right-aligned floating div
         $content .= '<div style="float: right; margin: 10px">';
         $content .= get_the_post_thumbnail( get_the_ID(), 'medium' );
