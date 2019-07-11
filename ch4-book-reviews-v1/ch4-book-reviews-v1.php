@@ -4,9 +4,9 @@
   Plugin Name: Chapter 4 - Book Reviews V1
   Plugin URI: 
   Description: Companion to recipe 'Creating a custom post type'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI:
  */
 
 /****************************************************************************
