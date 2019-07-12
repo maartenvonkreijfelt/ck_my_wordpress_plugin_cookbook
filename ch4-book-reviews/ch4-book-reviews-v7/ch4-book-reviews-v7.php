@@ -4,9 +4,9 @@
   Plugin Name: Chapter 4 - Book Reviews V7
   Plugin URI: 
   Description: Companion to recipe 'Hiding the category editor from the custom post type editor'
-  Author: Maarten von Kreijfelt
+  Author: ylefebvre
   Version: 1.0
-  Author URI:
+  Author URI: http://ylefebvre.ca/
  */
 
 /****************************************************************************

@@ -4,9 +4,9 @@
   Plugin Name: Chapter 5 - Post Source Link v1
   Plugin URI:
   Description: Companion to recipe 'Adding extra fields to the post editor using custom meta boxes'
-  Author: Maarten von Kreijfelt
+  Author: ylefebvre
   Version: 1.0
-  Author URI:
+  Author URI: http://ylefebvre.ca/
  */
 
 // Register function to be called when meta boxes are being registered

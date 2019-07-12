@@ -4,9 +4,9 @@
   Plugin Name: Chapter 6 - Book Review User Submission v1
   Plugin URI:
   Description: Companion to recipe 'Creating a client-side content submission form'
-  Author: Maarten von Kreijfelt
+  Author: ylefebvre
   Version: 1.0
-  Author URI:
+  Author URI: http://ylefebvre.ca/
  */
 
 // Declare shortcode and specify function to be called when found

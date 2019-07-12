@@ -4,9 +4,9 @@
   Plugin Name: Chapter 4 - Book Reviews V10
   Plugin URI: 
   Description: Companion to recipe 'Adding Quick Edit fields for custom categories'
-  Author: Maarten von Kreijfelt
+  Author: ylefebvre
   Version: 1.0
-  Author URI:
+  Author URI: http://ylefebvre.ca/
  */
 
 /****************************************************************************

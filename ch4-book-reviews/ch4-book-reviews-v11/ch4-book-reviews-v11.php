@@ -4,9 +4,9 @@
   Plugin Name: Chapter 4 - Book Reviews V11
   Plugin URI: 
   Description: Companion to recipe 'Updating page title to include custom post data using plugin filters'
-  Author: Maarten von Kreijfelt
+  Author: ylefebvre
   Version: 1.0
-  Author URI:
+  Author URI: http://ylefebvre.ca/
  */
 
 /****************************************************************************

@@ -3,9 +3,9 @@
   Plugin Name: Chapter 2 - Favicon
   Plugin URI:
   Description: Companion to recipe 'Using WordPress path utility functions'
-  Author: Maarten von Kreijfelt
+  Author: ylefebvre
   Version: 1.0
-  Author URI:
+  Author URI: http://ylefebvre.ca/
  */
 
 add_action( 'wp_head', 'ch2fi_page_header_output' );
