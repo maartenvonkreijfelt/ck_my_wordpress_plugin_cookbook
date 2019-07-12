@@ -3,9 +3,9 @@
   Plugin Name: Chapter 3 - Hide Menu Item Separate Admin
   Plugin URI:
   Description: Companion to recipe 'Splitting admin code from the main plugin file to optimize site performance'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI:
  */
  
 define( 'ch3hmi', 1 );

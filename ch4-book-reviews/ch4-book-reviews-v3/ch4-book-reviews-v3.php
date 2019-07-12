@@ -4,9 +4,9 @@
   Plugin Name: Chapter 4 - Book Reviews V3
   Plugin URI: 
   Description: Companion to recipe 'Displaying single custom post type items using a custom layout'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI:
  */
 
 /****************************************************************************

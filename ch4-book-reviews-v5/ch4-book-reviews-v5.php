@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: Chapter 4 - Book Reviews V4
+  Plugin Name: Chapter 4 - Book Reviews V5
   Plugin URI: 
-  Description: Companion to recipe 'Displaying custom post type data in shortcodes'
+  Description: Companion to recipe 'Adding custom categories for custom post types'
   Author: Maarten von Kreijfelt
   Version: 1.0
   Author URI:
@@ -40,6 +40,22 @@ function ch4_br_create_book_post_type() {
 		'menu_icon' => plugins_url( 'book-reviews.png', __FILE__ ),
 		'has_archive' => false,
 		'exclude_from_search' => true
+		)
+	);
+	
+	/* Code from recipe 'Adding custom taxonomies for custom post types */    
+	register_taxonomy(
+		'book_reviews_book_type',
+		'book_reviews',
+		array(
+			'labels' => array(
+				'name' => 'Book Type',
+				'add_new_item' => 'Add New Book Type',
+				'new_item_name' => "New Book Type Name"
+			),
+			'show_ui' => true,
+			'show_tagcloud' => false,
+			'hierarchical' => true
 		)
 	);
 }
@@ -167,12 +183,29 @@ function ch4_br_display_single_book_review( $content ) {
                 $content .= '<img src="' .
                     plugins_url( 'star-icon-grey.png', __FILE__ ) . '" />';
             }
-         }
+        }
+		 
+		$book_types = wp_get_post_terms( get_the_ID(), 'book_reviews_book_type' ); 
+ 
+		$content .= '<br /><strong>Type: </strong>';
 
-         // Display book review contents
-         $content .= '<br /><br />' . get_the_content( get_the_ID() ) . '</div>';
+		if ( $book_types ) { 
+			$first_entry = true; 
+			for ( $i = 0; $i < count( $book_types ); $i++ ) { 
+				if ( !$first_entry ) {
+					$content .= ', ';
+				}
+				$content .= $book_types[$i]->name; 
+				$first_entry = false; 
+			} 
+		} else {
+			$content .= 'None Assigned';
+		}
 
-         return $content;
+        // Display book review contents
+        $content .= '<br /><br />' . get_the_content( get_the_ID() ) . '</div>';
+
+        return $content;
      }
 } 
 

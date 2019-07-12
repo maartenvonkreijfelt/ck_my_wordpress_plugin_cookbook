@@ -4,9 +4,9 @@
   Plugin Name: Chapter 4 - Book Reviews V2
   Plugin URI: 
   Description: Companion to recipe 'Adding a new section to the custom post type editor'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI:
  */
 
 /****************************************************************************
@@ -43,6 +43,22 @@ function ch4_br_create_book_post_type() {
 		)
 	);
 }
+
+// Flush rewrite rules to add "review" as a permalink slug
+function my_rewrite_flush() {
+    ch4_br_create_book_post_type();
+    flush_rewrite_rules();
+}
+register_activation_hook( __FILE__, 'my_rewrite_flush' );
+
+
+/**
+//Another way to reset the permalinks rules (to make calls from the WordPress rewrite module to programmatically request for the permalinks configuration to be rebuilt) is as follows:
+<pre class="EnlighterJSRAW" data-enlighter-language="php">
+global $wp_rewrite;
+$wp_rewrite-&gt;flush_rules();
+</pre>
+ */
 
 /****************************************************************************
  * Code from recipe 'Adding a new section to the custom post type editor'

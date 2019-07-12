@@ -4,9 +4,9 @@
   Plugin Name: Chapter 6 - Book Review User Submission v2
   Plugin URI:
   Description: Companion to recipe 'Saving user-submitted content in custom post types'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI:
  */
 
 // Declare shortcode and specify function to be called when found
