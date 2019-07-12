@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: Chapter 5 - Post Source Link v1
+  Plugin Name: Chapter 5 - Post Source Link v2
   Plugin URI:
-  Description: Companion to recipe 'Adding extra fields to the post editor using custom meta boxes'
+  Description: Companion to recipe 'Displaying custom post data via filter functions' Chapter 5.2
   Author: Maarten von Kreijfelt
   Version: 1.0
   Author URI: 
@@ -24,6 +24,7 @@ function ch5_psl_register_meta_box() {
 
 
 
+
 /*
 * Replace with the function below if you want it to works for all posts and pages (also the custom posts
 
@@ -38,6 +39,7 @@ function ch5_psl_register_meta_box() {
 }
 
 */
+
 
 // Display meta box contents
 function ch5_psl_source_meta_box( $post ) { 
@@ -80,6 +82,34 @@ function ch5_psl_save_source_data( $post_id = false, $post = false ) {
 	}
 }
 
+/************************************************************************
+ Code from recipe 'Displaying custom post data via filter functions'
+ ************************************************************************/
 
+add_filter( 'the_content', 'ch5_psl_display_source_link' );
 
-
+function ch5_psl_display_source_link ( $content ) {  
+    $post_id = get_the_ID();
+  
+    if ( !empty( $post_id ) ) {
+		if ( 'post' == get_post_type( $post_id ) ||
+		     'page' == get_post_type( $post_id ) ) {
+			
+			// Retrieve current source name and address based on post ID 
+			$post_source_name =  
+				get_post_meta( $post_id, 'post_source_name', true ); 
+			$post_source_address = 
+				get_post_meta( $post_id, 'post_source_address', true ); 
+			 
+			// Output information to browser 
+			if ( !empty( $post_source_name ) &&  
+				 !empty( $post_source_address ) ) { 
+				$content .= '<div class="source_link">Source: '; 
+				$content .= '<a href="' . esc_url ( $post_source_address ); 
+				$content .= '">' . esc_html( $post_source_name ) . '</a></div>';
+			} 
+		}
+	}
+	
+	return $content;
+} 
