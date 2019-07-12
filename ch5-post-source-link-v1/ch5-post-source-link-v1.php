@@ -4,9 +4,9 @@
   Plugin Name: Chapter 5 - Post Source Link v1
   Plugin URI:
   Description: Companion to recipe 'Adding extra fields to the post editor using custom meta boxes'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI: 
  */
 
 // Register function to be called when meta boxes are being registered
@@ -21,6 +21,23 @@ function ch5_psl_register_meta_box() {
 	add_meta_box( 'ch5_psl_source_meta_box', 'Post/Page Source',
 		'ch5_psl_source_meta_box', 'page', 'normal' );
 }
+
+
+
+/*
+* Replace with the function below if you want it to works for all posts and pages (also the custom posts
+
+function ch5_psl_register_meta_box() {
+    $post_types = get_post_types( array(), 'objects' );
+    foreach ( $post_types as $post_type ) {
+        add_meta_box( 'ch5_psl_post_source_meta_box',
+            'Post/Page Source',
+            'ch5_psl_source_meta_box',
+            $post_type->name, 'normal' );
+    }
+}
+
+*/
 
 // Display meta box contents
 function ch5_psl_source_meta_box( $post ) { 
@@ -62,3 +79,7 @@ function ch5_psl_save_source_data( $post_id = false, $post = false ) {
 		}
 	}
 }
+
+
+
+
