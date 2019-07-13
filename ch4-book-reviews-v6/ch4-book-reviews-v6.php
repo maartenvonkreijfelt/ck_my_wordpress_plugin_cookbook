@@ -43,7 +43,9 @@ function ch4_br_create_book_post_type() {
 		)
 	);
 
-	/* Code from recipe 'Adding custom taxonomies for custom post types */    
+	/****************************************************************
+	*Code from recipe 'Adding custom taxonomies for custom post types' Chapter 4.5
+	******************************************************************/
 	register_taxonomy(
 		'book_reviews_book_type',
 		'book_reviews',
