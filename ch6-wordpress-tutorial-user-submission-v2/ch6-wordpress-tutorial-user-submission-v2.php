@@ -1,22 +1,17 @@
 <?php
 
 /*
-  Plugin Name: Chapter 6 - Book Review User Submission v1
+  Plugin Name: Chapter 6 - Book Review User Submission v2
   Plugin URI:
-  Description: Companion to recipe 'Creating a client-side content submission form' Chapter 6.1
+  Description: Companion to recipe 'Saving user-submitted content in custom post types' Chapter 6.2
   Author: Maarten von Kreijfelt
   Version: 1.0
   Author URI: 
  */
 
 
-
-
-
-
 /****************************************************************************
  * Code from recipe 'Creating a custom post type'
- * Chapter 4.1
  ****************************************************************************/
 
 add_action( 'init', 'ch4_br_create_book_post_type' );
@@ -87,7 +82,6 @@ $wp_rewrite-&gt;flush_rules();
 
 /****************************************************************************
  * Code from recipe 'Adding a new section to the custom post type editor'
- * Chapter 4.2
  ****************************************************************************/
 
 // Register function to be called when admin interface is visited
@@ -174,15 +168,19 @@ function ch4_br_add_book_review_fields( $post_id = false, $post = false ) {
 			update_post_meta( $post_id, 'book_rating', intval( $_POST['book_review_rating'] ) );
 		}
 
+		/*******************************************************************
+		* Code from recipe 'Hiding the taxonomy editor from the post editor
+		* while remaining in the admin menu'
+		*******************************************************************/
 
-
-
-
-
+		if ( isset( $_POST['book_review_book_type'] ) && !empty( $_POST['book_review_book_type'] ) ) {
+			wp_set_post_terms( $post_id, intval( $_POST['book_review_book_type'] ), 'book_reviews_book_type' );
+		}
+	}
+}
 
 /************************************************************************************
  * Code from recipe 'Displaying single custom post type items using a custom layout'
- * Chapter 4.3
  ************************************************************************************/
 
 add_filter( 'template_include', 'ch4_br_template_include', 1 );
@@ -261,7 +259,6 @@ function ch4_br_display_single_book_review( $content ) {
 
 /****************************************************************************
  * Code from recipe 'Displaying custom post type data in shortcodes'
- * Chapter 4.4
  ****************************************************************************/
 
 add_shortcode( 'book-review-list', 'ch4_br_book_review_list' );
@@ -324,7 +321,6 @@ function ch4_br_book_review_list() {
 
 /****************************************************************************
  * Code from recipe 'Adding custom fields to categories'
- * Chapter 4.6
  ****************************************************************************/
 
 add_action( 'book_reviews_book_type_edit_form_fields', 'ch4_br_book_type_new_fields', 10, 2 );
@@ -375,24 +371,8 @@ function ch4_br_save_book_type_new_fields( $term_id, $tt_id ) {
 }
 
 
-
-
-
-/*******************************************************************
-* Code from recipe 'Hiding the taxonomy editor from the post editor
-* while remaining in the admin menu'
-*  Chapter 4.7
-*******************************************************************/
-
-		if ( isset( $_POST['book_review_book_type'] ) && !empty( $_POST['book_review_book_type'] ) ) {
-			wp_set_post_terms( $post_id, intval( $_POST['book_review_book_type'] ), 'book_reviews_book_type' );
-		}
-	}
-}
-
 /****************************************************************************
  * Code from recipe 'Displaying additional columns in custom post list page'
- * Chapter 4.8
  ****************************************************************************/
 
 // Register function to be called when column list is being prepared
@@ -483,7 +463,6 @@ function ch4_br_column_ordering( $vars ) {
 /****************************************************************************
  * Code from recipe 'Adding filters for custom taxonomies to the custom
  * post list page'
- * Chapter 4.9
  ****************************************************************************/
 
 // Register function to be called when displaying post filter drop-down lists
@@ -527,7 +506,7 @@ function ch4_br_perform_book_type_filtering( $query ) {
 }
 
 /****************************************************************************
- * Code from recipe 'Adding Quick Edit fields for custom categories' Chapter 4.10
+ * Code from recipe 'Adding Quick Edit fields for custom categories'
  ****************************************************************************/
 
 add_action( 'quick_edit_custom_box', 'ch4_br_display_custom_quickedit_link', 10, 2 );
@@ -703,7 +682,7 @@ function ch4_br_save_quick_edit_data( $ID = false, $post = false ) {
 
 /****************************************************************************
  * Code from recipe 'Updating page title to include custom post data using
- * plugin filters' Chapter 4.11
+ * plugin filters'
  ****************************************************************************/
 
 add_filter( 'document_title_parts', 'ch4_br_format_book_review_title' );
@@ -718,85 +697,158 @@ function ch4_br_format_book_review_title( $the_title ) {
     }
 
     return $the_title;
-}
 
+
+
+
+
+}
 
 
 
 /****************************************************************************
  * Code from recipe 'Creating a client-side content submission form' Chapter 6.1
  ****************************************************************************/
-
-
-
 // Declare shortcode and specify function to be called when found
 add_shortcode( 'submit-book-review', 'ch6_brus_book_review_form' );
 
 // Function to replace shortcode with content when found
-function ch6_brus_book_review_form() { 
+function ch6_brus_book_review_form() {
 
-	// make sure user is logged in
-	if ( !is_user_logged_in() ) {
-		echo '<p>You need to be a site member to be able to submit book reviews. Sign up to gain access!</p>';
-		return;
-	}
-	?>
+    // make sure user is logged in
+    if ( !is_user_logged_in() ) {
+        echo '<p>You need to be a site member to be able to submit book reviews. Sign up to gain access!</p>';
+        return;
+    }
+    ?>
 
-	<form method="post" id="add_book_review" action="">
-		<!-- Nonce fields to verify visitor provenance -->
-		<?php wp_nonce_field( 'add_review_form', 'br_user_form' ); ?>	
-		
-	    <!-- Post variable to indicate user-submitted items -->
-		<input type="hidden" name="ch6_brus_user_book_review" value="1" />
-		
-		<table>
-			<tr>
-				<td>Book Title</td>
-				<td><input type="text" name="book_title" /></td>
-			</tr>
-			<tr>
-				<td>Book Author</td>
-				<td><input type="text" name="book_author" /></td>
-			</tr>
-			<tr>
-				<td>Review</td>
-				<td><textarea name="book_review_text"></textarea></td>
-			</tr>
-			<tr>
-				<td>Rating</td>
-				<td>
-					<select name="book_review_rating">
-					<?php
-					// Generate all rating items in drop-down list
-					for ( $rating = 5; $rating >= 1; $rating-- ) { ?>
-						<option value="<?php echo $rating; ?>"><?php echo $rating; ?> stars
-					<?php } ?>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>Book Type</td>
-				<td>
-					<?php 
+    <form method="post" id="add_book_review" action="">
+        <!-- Nonce fields to verify visitor provenance -->
+        <?php wp_nonce_field( 'add_review_form', 'br_user_form' ); ?>
 
-					// Retrieve array of all book types in system
-					$book_types = get_terms( 'book_reviews_book_type', array( 'orderby' => 'name', 'hide_empty' => 0 ) );
+        <!-- Display confirmation message to users who submit a book review -->
+        <?php if ( !empty( $_GET['add_review_message'] ) ) { ?>
+            <div style="margin: 8px;border: 1px solid #ddd;background-color: #ff0;">
+                Thank for your submission!
+            </div>
+        <?php } ?>
 
-					// Check if book types were found
-					if ( !is_wp_error( $book_types ) && !empty( $book_types ) ) {
-						echo '<select name="book_review_book_type">';
+        <!-- Post variable to indicate user-submitted items -->
+        <input type="hidden" name="ch6_brus_user_book_review" value="1" />
 
-						// Display all book types
-						foreach ( $book_types as $book_type ) {				
-							echo '<option value="' . $book_type->term_id . '">' . $book_type->name . '</option>';
-						}		
-						echo '</select>';
-					} ?>
-				</td>
-			</tr>
-		</table>
+        <table>
+            <tr>
+                <td>Book Title</td>
+                <td><input type="text" name="book_title" /></td>
+            </tr>
+            <tr>
+                <td>Book Author</td>
+                <td><input type="text" name="book_author" /></td>
+            </tr>
+            <tr>
+                <td>Review</td>
+                <td><textarea name="book_review_text"></textarea></td>
+            </tr>
+            <tr>
+                <td>Rating</td>
+                <td>
+                    <select name="book_review_rating">
+                        <?php
+                        // Generate all rating items in drop-down list
+                        for ( $rating = 5; $rating >= 1; $rating-- ) { ?>
+                        <option value="<?php echo $rating; ?>"><?php echo $rating; ?> stars
+                            <?php } ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Book Type</td>
+                <td>
+                    <?php
 
-		<input type="submit" name="submit" value="Submit Review" />
-	</form>
+                    // Retrieve array of all book types in system
+                    $book_types = get_terms( 'book_reviews_book_type', array( 'orderby' => 'name', 'hide_empty' => 0 ) );
 
-<?php }
+                    // Check if book types were found
+                    if ( !is_wp_error( $book_types ) && !empty( $book_types ) ) {
+                        echo '<select name="book_review_book_type">';
+
+                        // Display all book types
+                        foreach ( $book_types as $book_type ) {
+                            echo '<option value="' . $book_type->term_id . '">' . $book_type->name . '</option>';
+                        }
+                        echo '</select>';
+                    } ?>
+                </td>
+            </tr>
+        </table>
+
+        <input type="submit" name="submit" value="Submit Review" />
+    </form>
+
+    <?php
+
+}
+
+
+
+
+
+/****************************************************************************
+ * Code from recipe 'Saving user-submitted content in custom post types' Chapter 6.2
+ ****************************************************************************/
+add_action( 'template_redirect', 'ch6_brus_match_new_book_reviews' );
+
+function ch6_brus_match_new_book_reviews( $template ) {
+    if ( !empty( $_POST['ch6_brus_user_book_review'] ) ) {
+        ch6_brus_process_user_book_reviews();
+    } else {
+        return $template;
+    }
+}
+
+function ch6_brus_process_user_book_reviews()
+{
+
+    // Check that all required fields are present and non-empty
+    if (wp_verify_nonce($_POST['br_user_form'], 'add_review_form') &&
+        !empty($_POST['book_title']) &&
+        !empty($_POST['book_author']) &&
+        !empty($_POST['book_review_text']) &&
+        !empty($_POST['book_review_book_type']) &&
+        !empty($_POST['book_review_rating'])) {
+
+        // Create array with received data
+        $new_book_review_data = array(
+            'post_status' => 'draft',
+            'post_title' => $_POST['book_title'],
+            'post_type' => 'book_reviews',
+            'post_content' => $_POST['book_review_text']
+        );
+
+        // Insert new post in site database
+        // Store new post ID from return value in variable
+        $new_book_review_id = wp_insert_post($new_book_review_data);
+
+        // Store book author and rating
+        add_post_meta($new_book_review_id, 'book_author', wp_kses($_POST['book_author'], array()));
+        add_post_meta($new_book_review_id, 'book_rating', (int)$_POST['book_review_rating']);
+
+        // Set book type on post
+        if (term_exists($_POST['book_review_book_type'], 'book_reviews_book_type')) {
+            wp_set_post_terms($new_book_review_id, $_POST['book_review_book_type'], 'book_reviews_book_type');
+        }
+
+        // Redirect browser to book review submission page
+        $redirect_address = (empty($_POST['_wp_http_referer']) ? site_url() : $_POST['_wp_http_referer']);
+        wp_redirect(add_query_arg('add_review_message', '1', $redirect_address));
+        exit;
+    } else {
+        // Display error message if any required fields are missing
+        // or if form did not have valid nonce fields.
+        $abort_message = 'Some fields were left empty. Please ';
+        $abort_message .= 'go back and complete the form.';
+        wp_die($abort_message);
+        exit;
+    }
+}
