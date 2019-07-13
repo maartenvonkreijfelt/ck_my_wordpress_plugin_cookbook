@@ -1,9 +1,9 @@
 <?php
 
 /*
-  Plugin Name: Chapter 6 - Book Review User Submission v2
+  Plugin Name: Chapter 6 - Book Review User Submission v3
   Plugin URI:
-  Description: Companion to recipe 'Saving user-submitted content in custom post types' Chapter 6.2
+  Description: Companion to recipe 'Sending email notifications upon new submissions' Chapter 6.3
   Author: Maarten von Kreijfelt
   Version: 1.0
   Author URI: 
@@ -860,4 +860,33 @@ function ch6_brus_process_user_book_reviews()
         wp_die($abort_message);
         exit;
     }
+}
+
+
+
+/****************************************************************************
+ * Code from recipe 'Sending email notifications upon new submissions' Chapter 6.3
+ ****************************************************************************/
+
+
+add_action( 'wp_insert_post', 'ch6_brus_send_email', 10, 2 );
+
+function ch6_brus_send_email( $post_id, $post ) {
+	// Only send e-mails for user-submitted book reviews
+	if ( isset( $_POST['ch6_brus_user_book_review'] ) && 'book_reviews' == $post->post_type ) {
+		$headers = 'Content-type: text/html';
+
+		// Prepare e-mail message to notify site admin of new submission
+		$admin_mail = get_option( 'admin_email' );
+
+		$message = 'A user submitted a new book review to your Wordpress site database.<br /><br />';
+		$message .= 'Book Title: ' . $post->post_title . '<br />';
+
+		$message .= '<a href="' . add_query_arg( array( 'post_status' => 'draft', 'post_type' => 'book_reviews' ), admin_url( 'edit.php' ) ) . '">Moderate new book reviews</a>';
+
+		$email_title = htmlspecialchars_decode( get_bloginfo(), ENT_QUOTES ) . ' - New Book Review Added: ' . htmlspecialchars( $post->post_title );
+
+		// Send e-mail
+		wp_mail( $admin_mail, $email_title, $message, $headers );
+	}
 }
