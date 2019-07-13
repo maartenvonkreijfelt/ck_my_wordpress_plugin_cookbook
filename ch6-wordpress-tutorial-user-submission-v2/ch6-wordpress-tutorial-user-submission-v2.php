@@ -181,6 +181,7 @@ function ch4_br_add_book_review_fields( $post_id = false, $post = false ) {
 
 /************************************************************************************
  * Code from recipe 'Displaying single custom post type items using a custom layout'
+ * Chapter 4.3
  ************************************************************************************/
 
 add_filter( 'template_include', 'ch4_br_template_include', 1 );
@@ -259,6 +260,7 @@ function ch4_br_display_single_book_review( $content ) {
 
 /****************************************************************************
  * Code from recipe 'Displaying custom post type data in shortcodes'
+ * Chapter 4.4
  ****************************************************************************/
 
 add_shortcode( 'book-review-list', 'ch4_br_book_review_list' );
@@ -321,6 +323,7 @@ function ch4_br_book_review_list() {
 
 /****************************************************************************
  * Code from recipe 'Adding custom fields to categories'
+ * Chapter 4.6
  ****************************************************************************/
 
 add_action( 'book_reviews_book_type_edit_form_fields', 'ch4_br_book_type_new_fields', 10, 2 );
@@ -373,6 +376,7 @@ function ch4_br_save_book_type_new_fields( $term_id, $tt_id ) {
 
 /****************************************************************************
  * Code from recipe 'Displaying additional columns in custom post list page'
+ * Chapter 4.8
  ****************************************************************************/
 
 // Register function to be called when column list is being prepared
@@ -463,6 +467,7 @@ function ch4_br_column_ordering( $vars ) {
 /****************************************************************************
  * Code from recipe 'Adding filters for custom taxonomies to the custom
  * post list page'
+ * Chapter 4.9
  ****************************************************************************/
 
 // Register function to be called when displaying post filter drop-down lists
@@ -507,6 +512,7 @@ function ch4_br_perform_book_type_filtering( $query ) {
 
 /****************************************************************************
  * Code from recipe 'Adding Quick Edit fields for custom categories'
+ * Chapter 4.10
  ****************************************************************************/
 
 add_action( 'quick_edit_custom_box', 'ch4_br_display_custom_quickedit_link', 10, 2 );
@@ -683,6 +689,7 @@ function ch4_br_save_quick_edit_data( $ID = false, $post = false ) {
 /****************************************************************************
  * Code from recipe 'Updating page title to include custom post data using
  * plugin filters'
+ * Chapter 4.11
  ****************************************************************************/
 
 add_filter( 'document_title_parts', 'ch4_br_format_book_review_title' );
