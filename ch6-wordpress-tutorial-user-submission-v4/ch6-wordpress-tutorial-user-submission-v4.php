@@ -790,6 +790,22 @@ function ch6_brus_book_review_form() {
                     } ?>
                 </td>
             </tr>
+
+      <!--
+      /****************************************************************************
+ * Code from recipe 'Implementing a CAPTCHA on user forms using an online service' Chapter 6.4
+ ****************************************************************************/
+      -->
+
+            <tr>
+<td colspan="2">
+<div class="g-recaptcha"
+data-sitekey="[my-website-key]"></div>
+</td>
+</tr>
+
+
+
         </table>
 
         <input type="submit" name="submit" value="Submit Review" />
