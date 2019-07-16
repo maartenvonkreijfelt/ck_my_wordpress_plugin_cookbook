@@ -13,7 +13,7 @@ add_shortcode( 'twitterfeed', 'ch2te_twitter_embed_shortcode' );
 // Function that is called when the 'twitterfeed' shortcode is found
 function ch2te_twitter_embed_shortcode( $atts ) {
 	extract( shortcode_atts( array(
-		'user_name' => 'ylefebvre',
+		'user_name' => 'Maarten von Kreijfelt',
 		'option_id' => 1
 	), $atts ) );
 	

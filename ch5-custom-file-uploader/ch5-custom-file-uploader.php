@@ -4,9 +4,9 @@
   Plugin Name: Chapter 5 - Custom File Uploader
   Plugin URI: 
   Description: Companion to recipe 'Extending the post editor to allow users to upload files directly'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI: 
  */
 
 // Register function to be called when post editor form HTML is output

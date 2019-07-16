@@ -3,9 +3,9 @@
   Plugin Name: Chapter 3 – Settings API
   Plugin URI: 
   Description: Companion to recipe 'Rendering the admin page contents using the Settings API'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI: 
  */
 
 

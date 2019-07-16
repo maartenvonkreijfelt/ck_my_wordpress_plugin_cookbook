@@ -4,9 +4,9 @@
   Plugin Name: Chapter 4 - Book Reviews V9
   Plugin URI: 
   Description: Companion to recipe 'Adding filters for custom categories to the custom post list page'
-  Author: ylefebvre
+  Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI: http://ylefebvre.ca/
+  Author URI: 
  */
 
 /****************************************************************************
