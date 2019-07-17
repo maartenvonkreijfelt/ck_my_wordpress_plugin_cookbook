@@ -1,12 +1,15 @@
 <?php
 /*
-  Plugin Name: Chapter 2 - Private Item Text V3
+  Plugin Name: Chapter 2 - Private Item Text V4
   Plugin URI: 
-  Description: Companion to recipe 'Adding custom fields to the user editor'
+  Description: Companion to recipe 'Processing and storing user custom data'
   Author: Maarten von Kreijfelt
   Version: 1.0
-  Author URI:
+  Author URI: 
  */
+
+
+
 
 
 /***************************************************************
@@ -147,7 +150,7 @@ function ch2pit_config_page() {
 <?php }
 
 /********************************************************************************
- Code from recipe 'Adding custom fields to the user editor' Chapter 7.1
+ Code from recipe 'Adding custom fields to the user editor'
  ********************************************************************************/
 
 global $user_levels;
@@ -183,3 +186,20 @@ function ch2pit_show_user_profile( $user ) {
 	</table>
 	   
 <?php }
+
+/********************************************************************************
+ Code from recipe 'Processing and storing user custom data'
+ ********************************************************************************/
+
+add_action( 'profile_update', 'ch2pit_save_user_data' );
+add_action( 'user_register', 'ch2pit_save_user_data' );
+
+function ch2pit_save_user_data( $user_id ) {
+	global $user_levels;
+	
+    if ( isset( $_POST['user_level'] ) && !empty( $_POST['user_level'] ) && array_key_exists( $_POST['user_level'], $user_levels ) ) {
+        update_user_meta( $user_id, 'user_level', $_POST['user_level'] );
+    } else {
+		update_user_meta( $user_id, 'user_level', 'regular' );
+	}
+}
