@@ -1,8 +1,8 @@
 <?php
 /*
-  Plugin Name: Chapter 2 - Private Item Text V4
+  Plugin Name: Chapter 2 - Private Item Text V5
   Plugin URI: 
-  Description: Companion to recipe 'Processing and storing user custom data'
+  Description: Companion to recipe 'Display new user data in user list page'
   Author: Maarten von Kreijfelt
   Version: 1.0
   Author URI: 
@@ -10,13 +10,10 @@
 
 
 
-
-
 /***************************************************************
  * Starting point for this recipe
  * Chapter 2.9 Creating a new enclosing shortcode/ch2-private-item-text.php
  ***************************************************************/
-
 
 // Declare enclosing shortcode 'private' with associated function
 add_shortcode( 'private', 'ch2pit_private_shortcode' );
@@ -202,4 +199,90 @@ function ch2pit_save_user_data( $user_id ) {
     } else {
 		update_user_meta( $user_id, 'user_level', 'regular' );
 	}
+}
+
+/********************************************************************************
+ Code from recipe 'Display new user data in user list page'
+ ********************************************************************************/
+
+add_filter( 'manage_users_columns', 'ch2pit_add_user_columns' );
+
+function ch2pit_add_user_columns( $columns ) {
+    $new_columns = array_slice( $columns, 0, 2, true ) + 
+	               array( 'level' => 'User Level' ) + 
+				   array_slice( $columns, 2, NULL, true );
+    return $new_columns;
+}
+
+add_filter( 'manage_users_custom_column', 'ch2pit_display_user_columns_data', 10, 3 );
+
+function ch2pit_display_user_columns_data( $val, $column_name, $user_id ) {
+	global $user_levels;
+	if ( 'level' == $column_name ) {
+		$current_user_level = get_user_meta( $user_id, 'user_level', true );
+		if ( !empty( $current_user_level ) ) {
+			$val = $user_levels[$current_user_level];
+		}
+    }
+    return $val;
+}
+
+add_action( 'restrict_manage_users', 'ch2pit_add_user_filter' );
+
+function ch2pit_add_user_filter() {
+	global $user_levels;
+	$filter_value = '';
+	
+    if ( isset( $_GET['user_level'] ) ) {
+		$filter_value = $_GET['user_level'];
+	} ?>
+    
+	<select name="user_level" class="user_level" style="float:none;">
+	<option value="">No filter</option>
+	<?php foreach( $user_levels as $user_level_index => $user_level ) { ?>
+        <option value="<?php echo $user_level_index; ?>" 
+		<?php selected( $filter_value, $user_level_index ); ?>>
+		<?php echo $user_level; ?></option>
+    <?php } ?>
+    <input type="submit" class="button" value="Filter">
+<?php }
+
+add_action( 'admin_footer', 'ch2pit_user_filter_js' );
+
+function ch2pit_user_filter_js() {
+	global $current_screen;
+    if ( 'users' !== $current_screen->id ) {
+        return;
+    } ?>
+	
+	<script type="text/javascript">
+		jQuery( document ).ready( function() {
+			jQuery( '.user_level' ).first().change( function() {
+				var field_val = jQuery( this ).val()
+				jQuery( '.user_level' ).last().val( field_val );
+			});
+			
+			jQuery( '.user_level' ).last().change( function() {
+				jQuery( '.user_level' ).first().val( jQuery( this ).val() );
+			});
+		});
+	</script>res
+<?php }
+
+add_filter( 'pre_get_users', 'ch2pit_filter_users' );
+
+function ch2pit_filter_users( $query ) {
+    global $pagenow;
+	global $user_levels;
+
+    if ( is_admin() && 'users.php' == $pagenow && 
+         isset( $_GET['user_level'] ) ) {
+		$filter_value = $_GET['user_level'];
+		if ( !empty( $filter_value ) && array_key_exists( $filter_value, $user_levels ) ) {
+			$query->set( 'meta_key', 'user_level' );
+			$query->set( 'meta_query', array(
+							array( 'key' => 'user_level',
+								   'value' => $filter_value ) ) );
+		}
+    }
 }
