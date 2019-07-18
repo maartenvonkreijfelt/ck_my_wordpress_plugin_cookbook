@@ -1,8 +1,8 @@
 <?php
 /*
-  Plugin Name: Chapter 8 - Bug Tracker v2
+  Plugin Name: Chapter 8 - Bug Tracker v3
   Plugin URI:
-  Description: Companion to recipe 'Updating custom table structure on plugin upgrade'
+  Description: Companion to recipe 'Displaying custom table data in an admin page'
   Author: Maarten von Kreijfelt
   Version: 2.0
   Author URI: 
@@ -83,3 +83,58 @@ function ch8bt_create_table( $prefix ) {
 	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	dbDelta( $creation_query );
 }
+
+// Register function to be called when admin menu is constructed
+add_action( 'admin_menu', 'ch8bt_settings_menu' );
+
+// Add new menu item under Settings menu for Bug Tracker
+function ch8bt_settings_menu() {
+	add_options_page( 'Bug Tracker Data Management',
+		'Bug Tracker', 'manage_options',
+		'ch8bt-bug-tracker',
+		'ch8bt_config_page' );
+}
+
+// Function to render plugin admin page
+function ch8bt_config_page() {
+	global $wpdb;
+	?>
+	<!-- Top-level menu -->
+	<div id="ch8bt-general" class="wrap">
+	<h2>Bug Tracker
+		<a class="add-new-h2" 
+			href="<?php echo add_query_arg( array ( 'page' => 'ch8bt-bug-tracker', 'id' => 'new' ), admin_url( 'options-general.php' ) ); ?>">Add New Bug</a></h2>
+		
+	<!-- Display bug list if no parameter sent in URL -->
+	<?php if ( empty( $_GET['id'] ) ) { 
+		$bug_query = 'select * from ' . $wpdb->get_blog_prefix();
+		$bug_query .= 'ch8_bug_data ORDER by bug_report_date DESC';
+		$bug_items = $wpdb->get_results( $bug_query, ARRAY_A );
+	?>
+
+	<h3>Manage Bug Entries</h3>
+
+	<table class="wp-list-table widefat fixed" >
+	<thead><tr><th style="width: 80px">ID</th>
+	<th style=width: 300px>Title</th><th>Version</th></tr></thead>
+
+	<?php 
+		// Display bugs if query returned results
+		if ( $bug_items ) {
+			foreach ( $bug_items as $bug_item ) {
+				echo '<tr style="background: #FFF">';
+				echo '<td>' . $bug_item['bug_id'] . '</td>';
+				echo '<td><a href="' . add_query_arg( array( 'page' => 'ch8bt-bug-tracker', 'id' => $bug_item['bug_id'] ), admin_url( 'options-general.php' ) );
+				echo '">' . $bug_item['bug_title'] . '</a></td>';
+				echo '<td>' . $bug_item['bug_version'] . '</td></tr>';
+			}
+		} else {
+			echo '<tr style="background: #FFF">';
+			echo '<td colspan="3">No Bug Found</td></tr>';
+		}
+	?>
+	</table><br />
+
+	<?php } ?>
+	</div>
+<?php }
