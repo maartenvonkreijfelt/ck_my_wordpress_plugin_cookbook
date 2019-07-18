@@ -1,19 +1,41 @@
 <?php
 /*
-  Plugin Name: Chapter 2 - Private Item Text V5
+  Plugin Name: Chapter 2 - Private Item Text V6
   Plugin URI: 
-  Description: Companion to recipe 'Display new user data in user list page'
+  Description: Companion to recipe 'Use custom user data in containing shortcode'
   Author: Maarten von Kreijfelt
   Version: 1.0
   Author URI: 
  */
 
 
+/********************************************************************************
+ Code from recipe 'Use custom user data in containing shortcode'
+ *
+ * Starting point for this recipe (Starting point for this recipe
+ * Chapter 2.9 Creating a new enclosing shortcode/ch2-private-item-text.php)
+ * now adjusted for the 'paid' shortcode instead 'private'
+ *
+ ********************************************************************************/
 
-/***************************************************************
- * Starting point for this recipe
- * Chapter 2.9 Creating a new enclosing shortcode/ch2-private-item-text.php
- ***************************************************************/
+// Declare enclosing shortcode 'private' with associated function
+add_shortcode( 'paid', 'ch2pit_paid_shortcode' );
+
+// Function that is called when the 'paid' shortcode is found
+function ch2pit_paid_shortcode( $atts, $content = null ) {
+	if ( is_user_logged_in() ) {
+		$current_user = wp_get_current_user();
+		$current_user_level = get_user_meta( $current_user->ID, 'user_level', true );
+		if ( 'paid' == $current_user_level || current_user_can( 'activate_plugins' ) ) {
+			return '<div class="paid">' . $content . '</div>';
+		}
+	}
+	
+	$output = '<div class="register">';
+	$output .= 'You need to be a paid member to access ';
+	$output .= 'this content.</div>';
+	return $output;	
+}
 
 // Declare enclosing shortcode 'private' with associated function
 add_shortcode( 'private', 'ch2pit_private_shortcode' );
@@ -28,6 +50,8 @@ function ch2pit_private_shortcode( $atts, $content = null ) {
 		return $output;	
 	}
 }
+
+
 
 // Associate function with wp_head action hook to be called
 // when the page header is being rendered
