@@ -1,11 +1,11 @@
 <?php
 /*
-  Plugin Name: Chapter 8 - Bug Tracker V1_1
+  Plugin Name: Chapter 8 - Bug Tracker v2
   Plugin URI:
-  Description: Companion to recipe 'Creating new database tables'
-  Author: Maarten von kreijfelt
-  Version: 1.0
-  Author URI:
+  Description: Companion to recipe 'Updating custom table structure on plugin upgrade'
+  Author: Maarten von Kreijfelt
+  Version: 2.0
+  Author URI: 
  */
 
 // Register function to be called when plugin is activated
@@ -60,6 +60,7 @@ function ch8bt_new_network_site( $blog_id ) {
 
 		// Send blog table prefix to table creation function
 		ch8bt_create_table( $wpdb->get_blog_prefix() );
+
 		switch_to_blog( $start_blog );
 	}
 }
@@ -69,15 +70,16 @@ function ch8bt_create_table( $prefix ) {
 	// Prepare SQL query to create database table
 	// using received table prefix
 	$creation_query =
-		'CREATE TABLE IF NOT EXISTS ' . $prefix . 'ch8_bug_data (
+		'CREATE TABLE ' . $prefix . 'ch8_bug_data (
 			`bug_id` int(20) NOT NULL AUTO_INCREMENT,
 			`bug_description` text,
 			`bug_version` varchar(10) DEFAULT NULL,
 			`bug_report_date` date DEFAULT NULL,
 			`bug_status` int(3) NOT NULL DEFAULT 0,
+			`bug_title` VARCHAR( 128 ) NULL,
 			PRIMARY KEY (`bug_id`)
 			);';
 
-	global $wpdb;
-	$wpdb->query( $creation_query );
+	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+	dbDelta( $creation_query );
 }
