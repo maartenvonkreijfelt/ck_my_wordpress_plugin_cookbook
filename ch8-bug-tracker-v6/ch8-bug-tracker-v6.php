@@ -1,8 +1,8 @@
 <?php
 /*
-  Plugin Name: Chapter 8 - Bug Tracker v5 COPY
+  Plugin Name: Chapter 8 - Bug Tracker v6
   Plugin URI:
-  Description: Companion to recipe 'Deleting records from custom tables'
+  Description: Companion to recipe 'Displaying custom database table data in shortcodes'
   Author: Maarten von Kreijfelt
   Version: 2.0
   Author URI: 
@@ -290,6 +290,7 @@ function delete_ch8bt_bug() {
 	if ( !empty( $_POST['bugs'] ) ) {
 		// Retrieve array of bugs IDs to be deleted
 		$bugs_to_delete = $_POST['bugs'];
+
 		global $wpdb;
 
 		foreach ( $bugs_to_delete as $bug_to_delete ) {
@@ -302,4 +303,48 @@ function delete_ch8bt_bug() {
 	// Redirect the page to the admin form
 	wp_redirect( add_query_arg( 'page', 'ch8bt-bug-tracker', admin_url( 'options-general.php' ) ) );
 	exit;
+}
+
+// Define new shortcode and specify function to be called when found
+add_shortcode( 'bug-tracker-list', 'ch8bt_shortcode_list' );
+
+// Shortcode implementation function
+function ch8bt_shortcode_list() {
+	global $wpdb;
+
+	// Prepare query to retrieve bugs from database
+	$bug_query = 'select * from ' . $wpdb->get_blog_prefix();
+	$bug_query .= 'ch8_bug_data ORDER by bug_id DESC';
+	$bug_items = $wpdb->get_results( $bug_query, ARRAY_A );
+
+	// Prepare output to be returned to replace shortcode
+	$output = '';
+	$output .= '<div class="bug-tracker-list"><table>';
+
+	// Check if any bugs were found
+	if ( $bug_items ) {
+		$output .= '<tr><th style="width: 80px">ID</th>';
+		$output .= '<th style="width: 300px">Title / Desc</th>';
+		$output .= '<th>Version</th></tr>';
+
+		// Create row in table for each bug
+		foreach ( $bug_items as $bug_item ) {
+			$output .= '<tr style="background: #FFF">';
+			$output .= '<td>' . $bug_item['bug_id'] . '</td>';
+			$output .= '<td>' . $bug_item['bug_title'] . '</td>';
+			$output .= '<td>' . $bug_item['bug_version'] . '</td></tr>';
+			$output .= '<tr><td></td><td colspan="2">';
+			$output .= $bug_item['bug_description'];
+			$output .= '</td></tr>';
+		}
+	} else {
+		// Message displayed if no bugs are found
+		$output .= '<tr style="background: #FFF">';
+		$output .= '<td colspan=3>No Bugs to Display</td>';
+	}
+
+	$output .= '</table></div>';
+
+	// Return data prepared to replace shortcode on page/post
+	return $output;
 }
