@@ -1,8 +1,8 @@
 <?php
 /*
-  Plugin Name: Chapter 8 - Bug Tracker v4 COPY
+  Plugin Name: Chapter 8 - Bug Tracker v5 COPY
   Plugin URI:
-  Description: Companion to recipe 'Inserting and updating records in custom tables'
+  Description: Companion to recipe 'Deleting records from custom tables'
   Author: Maarten von Kreijfelt
   Version: 2.0
   Author URI: 
@@ -113,9 +113,14 @@ function ch8bt_config_page() {
 	?>
 
 	<h3>Manage Bug Entries</h3>
+	<form method="post" action="<?php echo admin_url( 'admin-post.php' ); ?>">
+	<input type="hidden" name="action" value="delete_ch8bt_bug" />
 
+	<!-- Adding security through hidden referrer field -->
+	<?php wp_nonce_field( 'ch8bt_deletion' ); ?>
+	
 	<table class="wp-list-table widefat fixed" >
-	<thead><tr><th style="width: 80px">ID</th>
+	<thead><tr><th style="width: 50px"></th><th style="width: 80px">ID</th>
 	<th style=width: 300px>Title</th><th>Version</th></tr></thead>
 
 	<?php 
@@ -123,6 +128,8 @@ function ch8bt_config_page() {
 		if ( $bug_items ) {
 			foreach ( $bug_items as $bug_item ) {
 				echo '<tr style="background: #FFF">';
+				echo '<td><input type="checkbox" name="bugs[]" value="';
+				echo esc_attr( $bug_item['bug_id'] ) . '" /></td>';
 				echo '<td>' . $bug_item['bug_id'] . '</td>';
 				echo '<td><a href="' . add_query_arg( array( 'page' => 'ch8bt-bug-tracker', 'id' => $bug_item['bug_id'] ), admin_url( 'options-general.php' ) );
 				echo '">' . $bug_item['bug_title'] . '</a></td>';
@@ -130,10 +137,13 @@ function ch8bt_config_page() {
 			}
 		} else {
 			echo '<tr style="background: #FFF">';
-			echo '<td colspan=4>No Bug Found</td></tr>';
+			echo '<td colspan="4">No Bug Found</td></tr>';
 		}
 	?>
 	</table><br />
+	
+	<input type="submit" value="Delete Selected" class="button-primary"/>
+	</form>
 
 	<?php } elseif ( isset( $_GET['id'] ) && ( 'new' == $_GET['id'] || is_numeric( $_GET['id'] ) ) ) {
 
@@ -222,7 +232,10 @@ add_action( 'admin_init', 'ch8bt_admin_init' );
 // Register functions to be called when bugs are saved
 function ch8bt_admin_init() {
 	add_action('admin_post_save_ch8bt_bug',
-		'process_ch8bt_bug' );
+		'process_ch8bt_bug');
+
+	add_action('admin_post_delete_ch8bt_bug',
+		'delete_ch8bt_bug');
 }
 
 // Function to be called when new bugs are created or existing bugs
@@ -255,6 +268,35 @@ function process_ch8bt_bug() {
 		$wpdb->insert($wpdb->get_blog_prefix() . 'ch8_bug_data', $bug_data );
 	} elseif ( isset( $_POST['bug_id'] ) && $_POST['bug_id'] > 0 ) {
 		$wpdb->update( $wpdb->get_blog_prefix() . 'ch8_bug_data', $bug_data, array( 'bug_id' => $_POST['bug_id'] ) );
+	}
+
+	// Redirect the page to the admin form
+	wp_redirect( add_query_arg( 'page', 'ch8bt-bug-tracker', admin_url( 'options-general.php' ) ) );
+	exit;
+}
+
+// Function to be called when deleting bugs
+function delete_ch8bt_bug() {
+	// Check that user has proper security level
+	if ( !current_user_can( 'manage_options' ) ) {
+		wp_die( 'Not allowed' );
+	}
+
+	// Check if nonce field is present
+	check_admin_referer( 'ch8bt_deletion' );
+
+	// If bugs are present, cycle through array and call SQL
+	// command to delete entries one by one
+	if ( !empty( $_POST['bugs'] ) ) {
+		// Retrieve array of bugs IDs to be deleted
+		$bugs_to_delete = $_POST['bugs'];
+		global $wpdb;
+
+		foreach ( $bugs_to_delete as $bug_to_delete ) {
+			$query = 'DELETE from ' . $wpdb->get_blog_prefix() . 'ch8_bug_data ';
+			$query .= 'WHERE bug_id = %d';
+			$wpdb->query( $wpdb->prepare( $query, intval( $bug_to_delete ) ) );
+		}
 	}
 
 	// Redirect the page to the admin form
